@@ -51,3 +51,4 @@ Look into your window manager manual/docs or use `xdotool`. (ex: you can use xdo
 ## Blacklisting
 If you want to blacklist some program you need to black list their process name. (obtained from top/ps). To the black list variable space separated.
 * no need to blacklist xev (xev will not be swollen because it lacks `_NET_WM_PID`)
+

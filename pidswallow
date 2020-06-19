@@ -5,9 +5,9 @@ verbose=0
 
 swallow() {
         cwid="$1"; pwid="$2"; cname="$3"; pname="$4";
-        [ "${swallowable#* $pname }" != "$swallowable" ] || return
+        [ "${swallowable#* $pname}" != "$swallowable" ] || return
         [ "${blacklist#* $cname }" != "$blacklist" ] && return
-        bspc node "$pwid" --flag hidden=on          #*
+        bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
 }
@@ -16,7 +16,7 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 0
         pwid=$(< "/tmp/swallowed-by-$cwid")
-        bspc node "$pwid" --flag hidden=off        #*
+        bspc node "$pwid" --flag hidden=off  -f                  #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"; return 0
 }
