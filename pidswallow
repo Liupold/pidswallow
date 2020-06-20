@@ -23,9 +23,11 @@ vomit() {
 }
 
 cwid="$1"
-cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)
+cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
 
-[ "$?" -ne 0 ] && vomit "$cwid" && exit
+[ -f "/tmp/swallowed-by-$cwid" ] && vomit "$cwid" && exit
+[ "$xprop_ret" -ne 0 ] && vomit "$cwid" && exit
+
 cpid="${cpid##* }"
 cname="$(ps -e | grep "$cpid")"; cname="${cname##* }"
 ptree="$(pstree -ATsp $cpid)"; ptree="${ptree#*---}"
