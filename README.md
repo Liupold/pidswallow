@@ -12,7 +12,11 @@ Super easy to config. Written for bspwm (can be ported to other wm easily).
 * Super fast. (Really!) (0.02s)
 ```
 ./pidswallow '0x02600002'  0.02s user 0.03s system 95% cpu 0.060 total
+
 ```
+
+## [Demo!](https://www.youtube.com/watch?v=R6A_JHJ7ob8&feature=youtu.be)
+
 
 ## How it works
 
