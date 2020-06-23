@@ -29,14 +29,6 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 3) xprop (Needed for window-id -> pid conversion).
 4) windows needed to have `_NET_WM_PID`.
 
-## Manual swallow (toggle)
-
-1) Add `pidswallow` to your path.
-2) run this and click on the child window (not the term) to swallow.
-```
- xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
-```
-3) or pass the widow-id via keyboard shortcut.
 
 ## Using with bspwm.
 
@@ -67,3 +59,22 @@ If you want to blacklist some program you need to black list their process name.
 
 ## Adding Terminals
 * you can chnage the `swallowable` var to add term. (by default $TERMINAL is added).
+
+## Knows Issues
+* `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
+* launching a second term from dmenu will not be swallowed. (because it's runs as a zsh subprocess_
+  - Solution: `setsid -f kitty` instead of `kitty`. (from dmenu).
+
+## Tricks.
+* ### Manual swallow (toggle)
+
+1) Add `pidswallow` to your path.
+2) run this and click on the child window (not the term) to swallow.
+```
+ xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
+```
+3) or pass the widow-id via keyboard shortcut.
+* Launch a program from term wihout being swallowed.
+```
+setsid -f <command>  # this will not swallow the terminal.
+```
