@@ -30,10 +30,12 @@ cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
 
 cpid="${cpid##* }"
 cname="$(ps -e | grep "$cpid")"; cname="${cname##* }"
-ptree="$(pstree -ATsp $cpid)"; ptree="${ptree#*---}"
-[ "$verbose" -eq 1 ] && echo "$ptree"
-parent="${ptree%%---*}"; pname="${parent%%(*}";
-ppid="${parent##*(}"; ppid="${ppid%)}"
+while ppid="$(sed -n 's/^PPid:[ \t]*\(.*\)/\1/p' /proc/$cpid/status)"; do
+    [ "$ppid" = 0 ] && exit 1 # looped to the top, no swallowable was found
+    pname="$(ps -p $ppid -o comm=)"
+    [ "${swallowable#* $pname}" != "$swallowable" ] && break # found swallowable!
+    cpid="$ppid" # set this parent as child and keep looping
+done
 [ -z "$ppid" ] && \
         "pls report this issue to https://github.com/liupold/pidswallow" && exit
 pwid="$(xdotool search --pid $ppid 2>/dev/null)"
