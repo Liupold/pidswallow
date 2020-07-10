@@ -2,11 +2,10 @@
 
 swallowable=" $TERMINAL urxvt kitty "
 blacklist=" $swallowable " # you don't want to swallow a swalloer right?
-verbose=0
+verbose=1
 
 swallow() {
         cwid="$1"; pwid="$2"; cname="$3"; pname="$4";
-        [ "${swallowable#* $pname}" != "$swallowable" ] || return
         [ "${blacklist#* $cname }" != "$blacklist" ] && return
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
