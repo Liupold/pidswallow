@@ -28,11 +28,11 @@ cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
 cpid="${cpid##* }"
 cname="$(cat /proc/"$cpid"/comm)"
 
-for parrent in $(pstree -ATsp "$cpid" | sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' )
+for parrent in $(pstree -ATsp "$cpid" | sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' | tac)
 do
         aname="$(echo "$parrent" | cut -d':' -f1)" # ancestor name
         [ "${swallowable#* $aname}" != "$swallowable" ] \
-                && ppid="$(echo "$parrent" | cut -d':' -f2)" && pname="$aname"
+                && ppid="$(echo "$parrent" | cut -d':' -f2)" && pname="$aname" && break
 done
 
 [ -z "$pname" ] && exit 1 # nothing swallow able.
