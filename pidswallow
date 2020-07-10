@@ -36,7 +36,5 @@ while ppid="$(sed -n 's/^PPid:[ \t]*\(.*\)/\1/p' /proc/$cpid/status)"; do
     [ "${swallowable#* $pname}" != "$swallowable" ] && break # found swallowable!
     cpid="$ppid" # set this parent as child and keep looping
 done
-[ -z "$ppid" ] && \
-        "pls report this issue to https://github.com/liupold/pidswallow" && exit
 pwid="$(xdotool search --pid $ppid 2>/dev/null)"
 swallow "$cwid" "$pwid" "$cname" "$pname"
