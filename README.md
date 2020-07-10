@@ -62,8 +62,6 @@ If you want to blacklist some program you need to black list their process name.
 
 ## Knows Issues
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
-* launching a second term from dmenu will not be swallowed. (because it's runs as a zsh subprocess_
-  - Solution: `setsid -f kitty` instead of `kitty`. (from dmenu).
 
 ## Tricks.
 * ### Manual swallow (toggle)
