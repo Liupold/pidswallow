@@ -28,7 +28,7 @@ cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
 [ "$xprop_ret" -ne 0 ] && vomit "$cwid" && exit
 
 cpid="${cpid##* }"
-cname="$(ps -e | grep "$cpid")"; cname="${cname##* }"
+cname="$(ps -p $cpid -o comm=)"
 while ppid="$(sed -n 's/^PPid:[ \t]*\(.*\)/\1/p' /proc/$cpid/status)"; do
     [ "$ppid" = 0 ] && exit 1 # looped to the top, no swallowable was found
     pname="$(ps -p $ppid -o comm=)"
