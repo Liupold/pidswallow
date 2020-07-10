@@ -2,7 +2,7 @@
 
 swallowable=" $TERMINAL urxvt kitty "
 blacklist=" $swallowable " # you don't want to swallow a swalloer right?
-verbose=1
+verbose=0
 
 swallow() {
         cwid="$1"; pwid="$2"; cname="$3"; pname="$4";
