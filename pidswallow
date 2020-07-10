@@ -2,11 +2,10 @@
 
 swallowable=" $TERMINAL urxvt kitty "
 blacklist=" $swallowable " # you don't want to swallow a swalloer right?
-verbose=0
+verbose=1
 
 swallow() {
         cwid="$1"; pwid="$2"; cname="$3"; pname="$4";
-        [ "${swallowable#* $pname}" != "$swallowable" ] || return
         [ "${blacklist#* $cname }" != "$blacklist" ] && return
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
@@ -30,11 +29,11 @@ cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
 
 cpid="${cpid##* }"
 cname="$(ps -e | grep "$cpid")"; cname="${cname##* }"
-ptree="$(pstree -ATsp $cpid)"; ptree="${ptree#*---}"
-[ "$verbose" -eq 1 ] && echo "$ptree"
-parent="${ptree%%---*}"; pname="${parent%%(*}";
-ppid="${parent##*(}"; ppid="${ppid%)}"
-[ -z "$ppid" ] && \
-        "pls report this issue to https://github.com/liupold/pidswallow" && exit
+while ppid="$(sed -n 's/^PPid:[ \t]*\(.*\)/\1/p' /proc/$cpid/status)"; do
+    [ "$ppid" = 0 ] && exit 1 # looped to the top, no swallowable was found
+    pname="$(ps -p $ppid -o comm=)"
+    [ "${swallowable#* $pname}" != "$swallowable" ] && break # found swallowable!
+    cpid="$ppid" # set this parent as child and keep looping
+done
 pwid="$(xdotool search --pid $ppid 2>/dev/null)"
 swallow "$cwid" "$pwid" "$cname" "$pname"
