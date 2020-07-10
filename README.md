@@ -12,7 +12,7 @@ Super easy to config. Written for bspwm (can be ported to other wm easily).
 * Super fast. (Really!) (0.02s) (faster than before).
 
 ```
-pidswallow 0x01800003  0.04s user 0.02s system 114% cpu 0.052 total (swallow)
+pidswallow 0x01800003  0.02s user 0.03s system 109% cpu 0.045 total (swallow)
 pidswallow 0x01800003  0.01s user 0.00s system 81% cpu 0.017 total (vomit)
 ```
 

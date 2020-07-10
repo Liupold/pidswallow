@@ -30,11 +30,11 @@ cname="$(cat /proc/"$cpid"/comm)"
 
 for parrent in $(pstree -ATsp "$cpid" | sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' | tac)
 do
-        aname="${parrent%%:*}" # ancestor name
-        [ "${swallowable#* $aname}" != "$swallowable" ] \
-                && ppid="${parrent##*:}" && pname="$aname" && break
+        pname="${parrent%%:*}" # ancestor name
+        [ "${swallowable#* $pname}" != "$swallowable" ] \
+                && ppid="${parrent##*:}" && break
 done
 
-[ -z "$pname" ] && exit 1 # nothing swallow able.
+[ -z "$ppid" ] && exit 1 # nothing swallow able.
 pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
 swallow "$cwid" "$pwid" "$cname" "$pname"
