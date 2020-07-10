@@ -9,10 +9,11 @@ Super easy to config. Written for bspwm (can be ported to other wm easily).
 * No loops. (you need to pass the wid externally somehow).
 * Just pass in the widow id of the swallower.
 * Work on a toggle mode. (swallow if not swollen else vomit).
-* Super fast. (Really!) (0.02s)
-```
-./pidswallow '0x02600002'  0.02s user 0.03s system 95% cpu 0.060 total
+* Super fast. (Really!) (0.02s) (faster than before).
 
+```
+pidswallow 0x01800003  0.04s user 0.02s system 114% cpu 0.052 total (swallow)
+pidswallow 0x01800003  0.01s user 0.00s system 81% cpu 0.017 total (vomit)
 ```
 
 ## [Demo!](https://www.youtube.com/watch?v=R6A_JHJ7ob8&feature=youtu.be)
