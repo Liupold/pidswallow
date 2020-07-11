@@ -29,9 +29,9 @@ vomit() {
 
 swallow() {
         cwid="$1"
-        cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
+        cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)"
+        [ "$?" -ne 0 ] && return 1
         cpid="${cpid##* }"
-        [ "$xprop_ret" -ne 0 ] && return 1
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
         for parrent in $(pstree -ATsp "$cpid" \
