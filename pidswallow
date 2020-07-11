@@ -6,7 +6,6 @@ verbose=0
 
 swallow() {
         cwid="$1"; pwid="$2"; cname="$3"; pname="$4";
-        [ "${blacklist#* $cname }" != "$blacklist" ] && return
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
@@ -26,10 +25,11 @@ cpid=$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null); xprop_ret="$?"
 [ "$xprop_ret" -ne 0 ] && vomit "$cwid"
 
 cpid="${cpid##* }"
-cname="$(cat /proc/"$cpid"/comm)"
+cname="$(ps -p "$cpid" -o comm=)"
 
-for parrent in $(pstree -ATsp "$cpid" | sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' | tac)
-do
+[ "${blacklist#* $cname }" != "$blacklist" ] && exit
+
+for parrent in $(pstree -ATsp "$cpid" | \sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' | tac); do
         pname="${parrent%%:*}" # ancestor name
         [ "${swallowable#* $pname}" != "$swallowable" ] \
                 && ppid="${parrent##*:}" && break
