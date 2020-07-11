@@ -1,12 +1,13 @@
 # A stupid simple swallower 😉.
 ### (Based on Process hierarchy)
 
-
 Super easy to config. Written for bspwm (can be ported to other wm easily).
+
+*Note: This new update is meant to be dropin replacement.(But it is recomended to update the bspwmrc)*
 
 ## Features
 * Based on process hierarchy (don't care about window focus).
-* No loops. (you need to pass the wid externally somehow).
+* cli like options. (super easy to use within scripts).
 * Just pass in the widow id of the swallower.
 * Work on a toggle mode. (swallow if not swollen else vomit).
 * Super fast. (Really!) (0.02s) (faster than before).
