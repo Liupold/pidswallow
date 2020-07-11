@@ -37,8 +37,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 2) Add the following script at the end of your bspwmrc. (`~/.config/bspwmrc`)
 
 ```bash
-bspc subscribe node_add node_remove \
-        | grep -o --line-buffered '0x[0-9A-F]\+$' | xargs -n1 pidswallow &
+TEMP="$(pgrep -f 'pidswallow --loop')"; [ -n "$TEMP" ] && kill $TEMP ; pidswallow --loop &
 ```
 3) Restart wm.
 
