@@ -24,7 +24,7 @@ vomit() {
         pwid=$(cat "/tmp/swallowed-by-$cwid")
         bspc node "$pwid" --flag hidden=off  -f                  #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
-        rm "/tmp/swallowed-by-$cwid"; return 0
+        rm "/tmp/swallowed-by-$cwid"
 }
 
 swallow() {
