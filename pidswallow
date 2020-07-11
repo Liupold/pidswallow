@@ -1,5 +1,5 @@
 #!/bin/sh
-useage="pidswallow (pid swallow for bspwm)
+usage="pidswallow (pid swallow for bspwm)
 Hides terminal window automatically, so that you don't have to
 
 pidswallow [OPTION ...]
@@ -35,12 +35,12 @@ swallow() {
         cpid="${cpid##* }"
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
-        for parrent in $(pstree -ATsp "$cpid" \
+        for parent in $(pstree -ATsp "$cpid" \
                 | sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' | tac); do
 
-                pname="${parrent%%:*}" # ancestor name
+                pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname}" != "$swallowable" ] \
-                        && ppid="${parrent##*:}" && break
+                        && ppid="${parent##*:}" && break
         done
         [ -z "$ppid" ] && return 1 # nothing swallow able.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
@@ -68,7 +68,7 @@ loop() { #*
         done
 }
 
-[ "$#" -eq 0 ] && echo "$useage" && exit 1
+[ "$#" -eq 0 ] && echo "$usage" && exit 1
 
 TEMP=$(getopt -o 'Vhlt:s:v:' --long 'verbose,help,loop,toggle:,swallow:,vomit:' \
         -n 'pidswallow' -- "$@")
@@ -77,7 +77,7 @@ eval set -- "${TEMP}"; unset TEMP
 while true; do
         case "$1" in
                 '-h' | '--help' )
-                        echo "$useage" && exit 0;;
+                        echo "$usage" && exit 0;;
                 '-V'|'--verbose')
                         verbose=1
                         shift; continue;;
@@ -97,14 +97,14 @@ while true; do
                         shift; break;;
                 *)
                         echo "Internal error!" >&2
-                        echo "$useage" && exit 1;;
+                        echo "$usage" && exit 1;;
         esac
 done
 
-# Toggle WID on first non-flag argument
+# toggle WID on first non-flag argument
 [ -n "$*" ] && toggle "$1" && shift
 
-# Error if there's more than one non-flag argument
+# error if there's more than one non-flag argument
 if [ -n "$*" ]; then
         echo "Unrecognized trailing option '$*'" >&2
         exit 1
