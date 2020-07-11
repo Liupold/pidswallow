@@ -100,5 +100,13 @@ while true; do
                         echo "$useage" && exit 1;;
         esac
 done
-[ -n "$*" ] && toggle "$1"; shift
-[ -n "$*" ] && echo "Unrecognized trailing option '$*'" >&2 && exit 1
+
+# Toggle WID on first non-flag argument
+[ -n "$*" ] && toggle "$1" && shift
+
+# Error if there's more than one non-flag argument
+if [ -n "$*" ]; then
+        echo "Unrecognized trailing option '$*'" >&2
+        exit 1
+fi
+
