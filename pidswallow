@@ -53,10 +53,10 @@ toggle() {
         cwid="$1"
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
                 vomit "$cwid"
-                exit "$?"
+                return "$?"
         else
                 swallow "$cwid"
-                exit "$?"
+                return "$?"
         fi
 }
 
