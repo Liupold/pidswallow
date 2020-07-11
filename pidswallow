@@ -36,7 +36,7 @@ swallow() {
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
         for parent in $(pstree -ATsp "$cpid" \
-                | sed -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' | tac); do
+                | sed -n -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac); do
 
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname}" != "$swallowable" ] \
