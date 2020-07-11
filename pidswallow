@@ -19,8 +19,8 @@ blacklist=" $swallowable octave-gui python "
 verbose=0
 
 vomit() {
-        [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         cwid="$1"
+        [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
         bspc node "$pwid" --flag hidden=off  -f                  #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
@@ -88,7 +88,7 @@ while true; do
                         swallow "$2"
                         shift 2; continue;;
                 '-v'|'--vomit')
-                        swallow "$2"
+                        vomit "$2"
                         shift 2; continue;;
                 '-l'|'--loop')
                         loop
