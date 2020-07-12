@@ -35,7 +35,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ## Using with bspwm.
 
 1) Add `pidswallow` to your path.
-2) Add the following script at the end of your bspwmrc. (`~/.config/bspwmrc`)
+2) Add the following line at the end of your bspwmrc. (`~/.config/bspwmrc`)
 
 ```bash
 TEMP="$(pgrep -f 'pidswallow --loop')"; [ -n "$TEMP" ] && kill $TEMP ; pidswallow --loop &
@@ -72,7 +72,7 @@ If you want to blacklist some program you need to black list their process name.
 ```
  xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
 ```
-3) or pass the window-id via keyboard shortcut. (Eg: sxiv toggle).
+3) or pass the window-id via keyboard shortcut. (Eg: sxhkd toggle).
 
 ```
 super + v
