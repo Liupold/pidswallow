@@ -70,7 +70,7 @@ If you want to blacklist some program you need to black list their process name.
 1) Add `pidswallow` to your path.
 2) run this and click on the child window (not the term) to swallow.
 ```
- xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
+ xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | pidswallow -t
 ```
 3) or pass the window-id via keyboard shortcut. (Eg: sxhkd toggle).
 
