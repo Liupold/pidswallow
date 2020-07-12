@@ -38,7 +38,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 2) Add the following line at the end of your bspwmrc. (`~/.config/bspwmrc`)
 
 ```bash
-TEMP="$(pgrep -f 'pidswallow --loop')"; [ -n "$TEMP" ] && kill $TEMP ; pidswallow --loop &
+pidswallow --loop &
 ```
 3) Restart wm.
 
