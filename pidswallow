@@ -48,7 +48,7 @@ swallow() {
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
                         && ppid="${parent##*:}" && break
         done
-        [ -z "$ppid" ] && return 1 # nothing swallow able.
+        [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
