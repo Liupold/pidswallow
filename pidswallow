@@ -19,12 +19,11 @@ blacklist=" $swallowable octave-gui python "
 verbose=0
 
 vomit() {
-        # focuses parent if child is dead else focus child.
+        # focuses parent if child is dead.
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        bspc node "$pwid" --flag hidden=off  -f                   #*
-        xprop -id "$cwid" >/dev/null 2>&1 && bspc node "$cwid" -f #*
+        xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" --flag hidden=off  -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 }
