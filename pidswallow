@@ -27,6 +27,7 @@ vomit() {
         xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
+        unset cwid pwid
 }
 
 swallow() {
@@ -52,6 +53,7 @@ swallow() {
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
+        unset cwid pwid cname pname ppid cpid
 }
 
 toggle() {
@@ -69,7 +71,6 @@ loop() { #*
         bspc subscribe node_add node_remove | while read -r event; do
                 [ "${event#node_add}" != "$event" ] && swallow "${event##* }"
                 [ "${event#node_remove}" != "$event" ] && vomit "${event##* }"
-                unset cwid pwid cname pname ppid cpid
         done
 }
 
