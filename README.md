@@ -72,7 +72,13 @@ If you want to blacklist some program you need to black list their process name.
 ```
  xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
 ```
-3) or pass the window-id via keyboard shortcut.
+3) or pass the window-id via keyboard shortcut. (Eg: sxiv toggle).
+
+```
+super + v
+    bspc query --nodes --node focused | pidswallow -t
+```
+
 * Launch a program from term wihout being swallowed.
 ```
 setsid -f <command>  # this will not swallow the terminal.

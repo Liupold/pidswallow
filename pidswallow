@@ -19,10 +19,12 @@ blacklist=" $swallowable octave-gui python "
 verbose=0
 
 vomit() {
+        # focuses parent if child is dead else focus child.
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        bspc node "$pwid" --flag hidden=off  -f                  #*
+        bspc node "$pwid" --flag hidden=off  -f                   #*
+        xprop -id "$cwid" >/dev/null 2>&1 && bspc node "$cwid" -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 }
@@ -72,6 +74,7 @@ loop() { #*
         done
 }
 
+[ -p /dev/stdin ] && eval set -- "$* $(cat /dev/stdin)" # basic pipe support
 [ "$#" -eq 0 ] && echo "$usage" && exit 1
 
 TEMP=$(getopt -o 'Vhlt:s:v:' --long 'verbose,help,loop,toggle:,swallow:,vomit:' \
