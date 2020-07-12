@@ -13,8 +13,8 @@ Super easy to config. Written for bspwm (can be ported to other wm easily).
 * Super fast. (Really!) (0.02s) (faster than before).
 
 ```
-pidswallow 0x01800003  0.02s user 0.03s system 109% cpu 0.045 total (swallow)
-pidswallow 0x01800003  0.01s user 0.00s system 81% cpu 0.017 total (vomit)
+pidswallow '0x04800003'  0.02s user 0.04s system 107% cpu 0.058 total (swallow)
+pidswallow '0x04800003'  0.01s user 0.01s system 71% cpu 0.032 total (vomit)
 ```
 
 ## [Demo!](https://www.youtube.com/watch?v=R6A_JHJ7ob8&feature=youtu.be)
