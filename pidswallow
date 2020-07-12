@@ -66,8 +66,7 @@ toggle() {
 }
 
 loop() { #*
-        while true; do
-                event="$(bspc subscribe -c 1 node_add node_remove)"
+        bspc subscribe node_add node_remove | while read -r event; do
                 [ "${event#node_add}" != "$event" ] && swallow "${event##* }"
                 [ "${event#node_remove}" != "$event" ] && vomit "${event##* }"
                 unset cwid pwid cname pname ppid cpid
