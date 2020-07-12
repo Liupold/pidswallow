@@ -8,8 +8,8 @@ Super easy to config. Written for bspwm (can be ported to other wm easily).
 ## Features
 * Based on process hierarchy (don't care about window focus).
 * cli like options. (super easy to use within scripts).
-* Just pass in the widow id of the swallower.
-* Work on a toggle mode. (swallow if not swollen else vomit).
+* Just pass in the window id of the swallower.
+* Work on a toggle mode. (swallow if not swallowed else vomit).
 * Super fast. (Really!) (0.02s) (faster than before).
 
 ```
@@ -56,10 +56,10 @@ Look into your window manager manual/docs or use `xdotool`. (ex: you can use xdo
 
 ## Blacklisting
 If you want to blacklist some program you need to black list their process name. (obtained from top/ps). To the black list variable space separated.
-* no need to blacklist xev (xev will not be swollen because it lacks `_NET_WM_PID`)
+* no need to blacklist xev (xev will not be swallowed because it lacks `_NET_WM_PID`)
 
 ## Adding Terminals
-* you can chnage the `swallowable` var to add term. (by default $TERMINAL is added).
+* you can change the `swallowable` var to add term. (by default $TERMINAL is added).
 
 ## Knows Issues
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
@@ -72,7 +72,7 @@ If you want to blacklist some program you need to black list their process name.
 ```
  xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
 ```
-3) or pass the widow-id via keyboard shortcut.
+3) or pass the window-id via keyboard shortcut.
 * Launch a program from term wihout being swallowed.
 ```
 setsid -f <command>  # this will not swallow the terminal.
