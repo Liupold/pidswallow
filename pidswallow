@@ -43,9 +43,8 @@ swallow() {
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
         for parent in $(pstree -ATsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac); do
-
                 pname="${parent%%:*}" # ancestor name
-                [ "${swallowable#* $pname}" != "$swallowable" ] \
+                [ "${swallowable#* $pname }" != "$swallowable" ] \
                         && ppid="${parent##*:}" && break
         done
         [ -z "$ppid" ] && return 1 # nothing swallow able.
@@ -71,6 +70,7 @@ loop() { #*
                 event="$(bspc subscribe -c 1 node_add node_remove)"
                 [ "${event#node_add}" != "$event" ] && swallow "${event##* }"
                 [ "${event#node_remove}" != "$event" ] && vomit "${event##* }"
+                unset cwid pwid cname pname ppid cpid
         done
 }
 
