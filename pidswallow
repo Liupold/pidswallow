@@ -29,8 +29,7 @@ vomit() {
 
 swallow() {
         cwid="$1"
-        cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)"
-        [ "$?" -ne 0 ] && return 1
+        cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)" || return 1
         [ "${cpid#*not found*}" != "$cpid" ] && return 1 # window didn't have _NET_WM_PID
         cpid="${cpid##* }"
         cname="$(ps -p "$cpid" -o comm=)"
