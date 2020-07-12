@@ -23,7 +23,8 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" --flag hidden=off  -f #*
+        bspc node "$pwid" --flag hidden=off                       #*
+        xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 }
