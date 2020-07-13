@@ -19,7 +19,7 @@ pidswallow '0x04800003'  0.01s user 0.01s system 71% cpu 0.032 total (vomit)
 
 ## Demo
 
-[![Demo](https://yt-embed.herokuapp.com/embed?v=R6A_JHJ7ob8)](https://www.youtube.com/watch?v=R6A_JHJ7ob8 "Demo for pidswallow.")]
+[![Demo](https://yt-embed.herokuapp.com/embed?v=R6A_JHJ7ob8)](https://www.youtube.com/watch?v=R6A_JHJ7ob8 "Demo for pidswallow.")
 
 
 ## How it works
