@@ -19,6 +19,7 @@ blacklist=" $swallowable octave-gui python "
 verbose=0
 
 vomit() {
+        local cwid pwid
         # focuses parent if child is dead.
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
@@ -27,10 +28,10 @@ vomit() {
         xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-        unset cwid pwid
 }
 
 swallow() {
+        local cwid pwid cname pname ppid cpid
         # return values
         # 0 -> Found and swallowed
         # 1 -> No swallow able  node found.
@@ -53,11 +54,10 @@ swallow() {
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
-        unset cwid pwid cname pname ppid cpid
 }
 
 toggle() {
-        cwid="$1"
+        local cwid="$1"
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
                 swallow "$cwid"
                 vomit "$cwid"
