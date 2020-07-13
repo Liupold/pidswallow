@@ -59,6 +59,7 @@ swallow() {
 toggle() {
         cwid="$1"
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
+                swallow "$cwid"
                 vomit "$cwid"
                 return "$?"
         else
