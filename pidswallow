@@ -27,6 +27,7 @@ vomit() {
         xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
+        unset cwid pwid
 }
 
 swallow() {
@@ -47,11 +48,12 @@ swallow() {
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
                         && ppid="${parent##*:}" && break
         done
-        [ -z "$ppid" ] && return 1 # nothing swallow able.
+        [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
         bspc node "$pwid" --flag hidden=on                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
+        unset cwid pwid cname pname ppid cpid
 }
 
 toggle() {
@@ -70,7 +72,6 @@ loop() { #*
                 [ "${event#node_add}" != "$event" ] && swallow "${event##* }"
                 [ "${event#node_remove}" != "$event" ] && vomit "${event##* }"
                 [ "$event" = "W" ] && return 0 # bspwm restarted
-                unset cwid pwid cname pname ppid cpid
         done
         return 1 # bspc subscribe exited unexpectedly
 }
