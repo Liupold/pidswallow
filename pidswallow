@@ -33,7 +33,7 @@ vomit() {
 swallow() {
         # return values
         # 0 -> Found and swallowed
-        # 1 -> No swallow able  node found.
+        # 1 -> No swallowable window found.
         # 2x -> xprop return a non zero exit code.(x is returned by xprop)
         # 3 -> window lacks a _NET_WM_PID property.
         # 4 -> window already swallowed
