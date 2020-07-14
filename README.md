@@ -81,6 +81,7 @@ If you want to blacklist some program you need to black list their process name.
 
 ## Knows Issues
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
+    - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
 
 ## Tricks.
 * ### Manual swallow (toggle)
