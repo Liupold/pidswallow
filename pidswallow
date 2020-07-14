@@ -33,9 +33,10 @@ vomit() {
 swallow() {
         # return values
         # 0 -> Found and swallowed
-        # 1 -> No swallow able  node found.
+        # 1 -> No swallowable window found.
         # 2x -> xprop return a non zero exit code.(x is returned by xprop)
         # 3 -> window lacks a _NET_WM_PID property.
+        # 4 -> window already swallowed
         cwid="$1"
         cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)" || return "2$?"
         [ "${cpid#*not found*}" != "$cpid" ] && return 3 # window didn't have _NET_WM_PID
@@ -50,7 +51,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
-        bspc node "$pwid" --flag hidden=on                      #*
+        bspc node "$pwid".!hidden --flag hidden=on || return 4                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         unset cwid pwid cname pname ppid cpid
@@ -59,7 +60,6 @@ swallow() {
 toggle() {
         cwid="$1"
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
-                swallow "$cwid"
                 vomit "$cwid"
                 return "$?"
         else
