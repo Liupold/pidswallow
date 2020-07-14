@@ -94,16 +94,16 @@ while true; do
                         verbose=1
                         shift; continue;;
                 '-t'|'--toggle')
-                        toggle "$2"
+                        toggle "$2" || exit "$?"
                         shift 2; continue;;
                 '-s'|'--swallow')
-                        swallow "$2"
+                        swallow "$2" || exit "$?"
                         shift 2; continue;;
                 '-v'|'--vomit')
-                        vomit "$2"
+                        vomit "$2" || exit "$?"
                         shift 2; continue;;
                 '--loop')
-                        loop
+                        loop || exit "$?"
                         shift; continue;;
                 '--')
                         shift; break;;
