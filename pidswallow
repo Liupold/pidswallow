@@ -20,6 +20,7 @@ verbose=0
 
 vomit() {
         # focuses parent if child is dead.
+        unset cwid pwid # similar to local
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
@@ -27,7 +28,6 @@ vomit() {
         xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" -f #*
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-        unset cwid pwid
 }
 
 swallow() {
@@ -37,6 +37,7 @@ swallow() {
         # 2x -> xprop return a non zero exit code.(x is returned by xprop)
         # 3 -> window lacks a _NET_WM_PID property.
         # 4 -> window already swallowed
+        unset cwid pwid cname pname ppid cpid # similar to local.
         cwid="$1"
         cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)" || return "2$?"
         [ "${cpid#*not found*}" != "$cpid" ] && return 3 # window didn't have _NET_WM_PID
@@ -54,7 +55,6 @@ swallow() {
         bspc node "$pwid".!hidden --flag hidden=on || return 4                      #*
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
-        unset cwid pwid cname pname ppid cpid
 }
 
 toggle() {
