@@ -8,6 +8,22 @@ Super easy to config. Written for bspwm (can be ported to other wm easily).
 ## Features
 * Based on process hierarchy (don't care about window focus).
 * cli like options. (super easy to use within scripts).
+```shell
+pidswallow (pid swallow for bspwm)
+Hides terminal window automatically, so that you don't have to
+
+pidswallow [OPTION ...]
+
+OPTIONS:
+        -h  --help              Show this message
+        -s  --swallow <CWID>    Hides parent window of the given child window id.
+        -v  --vomit <CWID>      Unhides parent window of the given child window id.
+        -t  --toggle <CWID>     toggle between swallow and vomit. (default)
+            --loop              listen and hide / unhide window on launch / remove.
+        -V  --verbose           Shows usefull information.
+
+bugs/issues: https://github.com/liupold/pidswallow.
+```
 * Just pass in the window id of the swallower.
 * Work on a toggle mode. (swallow if not swallowed else vomit).
 * Super fast. (Really!) (0.02s) (faster than before).
