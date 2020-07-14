@@ -15,7 +15,7 @@ OPTIONS:
 bugs/issues: https://github.com/liupold/pidswallow.
 "
 swallowable=" $TERMINAL urxvt kitty "
-blacklist=" $swallowable octave-gui python "
+blacklist=" $swallowable "
 verbose=0
 
 vomit() {
