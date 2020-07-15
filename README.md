@@ -1,21 +1,41 @@
 # A stupid simple swallower 😉.
 ### (Based on Process hierarchy)
 
-
 Super easy to config. Written for bspwm (can be ported to other wm easily).
+
+*Note: This new update is meant to be dropin replacement.(But it is recomended to update the bspwmrc)*
 
 ## Features
 * Based on process hierarchy (don't care about window focus).
-* No loops. (you need to pass the wid externally somehow).
-* Just pass in the widow id of the swallower.
-* Work on a toggle mode. (swallow if not swollen else vomit).
-* Super fast. (Really!) (0.02s)
+* cli like options. (super easy to use within scripts).
+```shell
+pidswallow (pid swallow for bspwm)
+Hides terminal window automatically, so that you don't have to
+
+pidswallow [OPTION ...]
+
+OPTIONS:
+        -h  --help              Show this message
+        -s  --swallow <CWID>    Hides parent window of the given child window id.
+        -v  --vomit <CWID>      Unhides parent window of the given child window id.
+        -t  --toggle <CWID>     toggle between swallow and vomit. (default)
+            --loop              listen and hide / unhide window on launch / remove.
+        -V  --verbose           Shows usefull information.
+
+bugs/issues: https://github.com/liupold/pidswallow.
 ```
-./pidswallow '0x02600002'  0.02s user 0.03s system 95% cpu 0.060 total
+* Just pass in the window id of the swallower.
+* Work on a toggle mode. (swallow if not swallowed else vomit).
+* Super fast. (Really!) (0.02s) (faster than before).
 
 ```
+pidswallow '0x04800003'  0.02s user 0.04s system 107% cpu 0.058 total (swallow)
+pidswallow '0x04800003'  0.01s user 0.01s system 71% cpu 0.032 total (vomit)
+```
 
-## [Demo!](https://www.youtube.com/watch?v=R6A_JHJ7ob8&feature=youtu.be)
+## Demo
+
+[![Demo](https://yt-embed.herokuapp.com/embed?v=R6A_JHJ7ob8)](https://www.youtube.com/watch?v=R6A_JHJ7ob8 "Demo for pidswallow.")
 
 
 ## How it works
@@ -33,11 +53,10 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ## Using with bspwm.
 
 1) Add `pidswallow` to your path.
-2) Add the following script at the end of your bspwmrc. (`~/.config/bspwmrc`)
+2) Add the following line at the end of your bspwmrc. (`~/.config/bspwmrc`)
 
 ```bash
-bspc subscribe node_add node_remove \
-        | grep -o --line-buffered '0x[0-9A-F]\+$' | xargs -n1 pidswallow &
+pidswallow --loop &
 ```
 3) Restart wm.
 
@@ -54,14 +73,15 @@ Look into your window manager manual/docs or use `xdotool`. (ex: you can use xdo
 * Change `#*` lines in the script with your preferred way of hiding windows.
 
 ## Blacklisting
-If you want to blacklist some program you need to black list their process name. (obtained from top/ps). To the black list variable space separated.
-* no need to blacklist xev (xev will not be swollen because it lacks `_NET_WM_PID`)
+If you want to blacklist some program you need to black list their process name. (obtained from top/ps). To the black list variable [space separated].
+* no need to blacklist xev (xev will not be swallowed because it lacks `_NET_WM_PID`)
 
 ## Adding Terminals
-* you can chnage the `swallowable` var to add term. (by default $TERMINAL is added).
+* you can change the `swallowable` var to add term. (by default $TERMINAL is added).
 
 ## Knows Issues
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
+    - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
 
 ## Tricks.
 * ### Manual swallow (toggle)
@@ -69,9 +89,15 @@ If you want to blacklist some program you need to black list their process name.
 1) Add `pidswallow` to your path.
 2) run this and click on the child window (not the term) to swallow.
 ```
- xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | xargs pidswallow
+ xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | pidswallow -t
 ```
-3) or pass the widow-id via keyboard shortcut.
+3) or pass the window-id via keyboard shortcut. (Eg: sxhkd toggle).
+
+```
+super + v
+    bspc query --nodes --node focused | pidswallow -t
+```
+
 * Launch a program from term wihout being swallowed.
 ```
 setsid -f <command>  # this will not swallow the terminal.
