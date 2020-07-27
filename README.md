@@ -51,6 +51,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 4) windows needed to have `_NET_WM_PID`.
 
 
+## Installation
 1) Add `pidswallow` to your path.
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
