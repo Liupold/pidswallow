@@ -45,10 +45,9 @@ pidswallow '0x04800003'  0.01s user 0.01s system 71% cpu 0.032 total (vomit)
 takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ```
 ## Dependencies
-1) xargs (`find-utils`)
-2) xdotool (Needed for pid -> window-id conversion).
-3) xprop (Needed for window-id -> pid conversion).
-4) windows needed to have `_NET_WM_PID`.
+1) xdotool (Needed for pid -> window-id conversion).
+2) xprop (Needed for window-id -> pid conversion).
+3) windows needed to have `_NET_WM_PID`.
 
 ## Installation
 1) Add `pidswallow` to your path.
