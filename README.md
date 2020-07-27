@@ -50,18 +50,25 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 3) xprop (Needed for window-id -> pid conversion).
 4) windows needed to have `_NET_WM_PID`.
 
-
 ## Installation
 1) Add `pidswallow` to your path.
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
 ```bash
-pidswallow --loop &
+pgrep -fl 'pidswallow --loop' || pidswallow --loop
 ```
 3) Restart wm.
 
+## Tested on
+*(If you did please let me know, If it dosent work create a issue).*
+
+* bspwm
+* i3
+
 ## Blacklisting
-If you want to blacklist some program you need to black list their process name. (obtained from top/ps). To the black list variable [space separated].
+If you want to blacklist some program you need to black list their process name. (obtained from top/ps).
+To the `blacklist` variable [space separated].
+
 * no need to blacklist xev (xev will not be swallowed because it lacks `_NET_WM_PID`)
 
 ## Adding Terminals
@@ -83,7 +90,7 @@ If you want to blacklist some program you need to black list their process name.
 
 ```
 super + v
-    bspc query --nodes --node focused | pidswallow -t
+    pidswallow -t "0x$(echo "ibase=10;obase=16; $(xdotool getwindowfocus)" | bc)"
 ```
 
 * Launch a program from term wihout being swallowed.
