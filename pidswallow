@@ -1,5 +1,5 @@
 #!/bin/sh
-usage="pidswallow (pid swallow for bspwm)
+usage="pidswallow (pid swallow WM/DE independent)
 Hides terminal window automatically, so that you don't have to
 
 pidswallow [OPTION ...]
@@ -24,8 +24,8 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        bspc node "$pwid" --flag hidden=off                       #*
-        xprop -id "$cwid" >/dev/null 2>&1 || bspc node "$pwid" -f #*
+        xdotool windowmap "$pwid"
+        xprop -id "$cwid" >/dev/null 2>&1 || xdotool windowactivate "$pwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 }
@@ -39,11 +39,14 @@ swallow() {
         # 4 -> window already swallowed
         unset cwid pwid cname pname ppid cpid # similar to local.
         cwid="$1"
+        [ -f "/tmp/swallowed-by-$cwid" ] && return 4
+
         cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)" || return "2$?"
         [ "${cpid#*not found*}" != "$cpid" ] && return 3 # window didn't have _NET_WM_PID
         cpid="${cpid##* }"
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
+
         for parent in $(pstree -ATsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac); do
                 pname="${parent%%:*}" # ancestor name
@@ -52,7 +55,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
-        bspc node "$pwid".!hidden --flag hidden=on || return 4                      #*
+        xdotool windowunmap "$pwid"
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
 }
@@ -68,13 +71,29 @@ toggle() {
         fi
 }
 
-loop() { #*
-        bspc subscribe node_add node_remove report | while read -r event; do
-                [ "${event#node_add}" != "$event" ] && swallow "${event##* }"
-                [ "${event#node_remove}" != "$event" ] && vomit "${event##* }"
-                [ "$event" = "W" ] && return 0
+loop() {
+        prev_event="$(xprop -root  _NET_CLIENT_LIST)"
+
+        xprop -spy -root  _NET_CLIENT_LIST | while read -r event; do
+                unset node_added node_removed
+
+                for wid in $(echo "${event##*# }" | tr -d ','); do
+                        [ "${prev_event#*$wid}" = "$prev_event" ] \
+                                && node_added="$wid" && break
+                done
+
+
+                for wid in $(echo "${prev_event##*# }" | tr -d ','); do
+                        [ "${event#*$wid}" = "$event" ] \
+                                && node_removed="$wid" && break
+                done
+
+                prev_event="$event"
+                # [ -z "${node_added}${node_removed}" ] && continue
+                [ -n "$node_added" ] && swallow "$node_added"
+                [ -n "$node_removed" ] && vomit "$node_removed"
         done
-        return 1 # bspc subscribe exited unexpectedly
+        return 1
 }
 
 [ -p /dev/stdin ] && eval set -- "$* $(cat /dev/stdin)" # basic pipe support

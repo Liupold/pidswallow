@@ -1,15 +1,16 @@
 # A stupid simple swallower 😉.
 ### (Based on Process hierarchy)
 
-Super easy to config. Written for bspwm (can be ported to other wm easily).
+Super easy to config. Uses `xdoool` WM/DE independent.
 
-*Note: This new update is meant to be dropin replacement.(But it is recomended to update the bspwmrc)*
 
 ## Features
 * Based on process hierarchy (don't care about window focus).
 * cli like options. (super easy to use within scripts).
+* Window Managers and Desktop Environment Independent.
+
 ```shell
-pidswallow (pid swallow for bspwm)
+pidswallow (pid swallow WM/DE independent)
 Hides terminal window automatically, so that you don't have to
 
 pidswallow [OPTION ...]
@@ -19,7 +20,7 @@ OPTIONS:
         -s  --swallow <CWID>    Hides parent window of the given child window id.
         -v  --vomit <CWID>      Unhides parent window of the given child window id.
         -t  --toggle <CWID>     toggle between swallow and vomit. (default)
-            --loop              listen and hide / unhide window on launch / remove.
+        -l  --loop              listen and hide / unhide window on launch / remove.
         -V  --verbose           Shows usefull information.
 
 bugs/issues: https://github.com/liupold/pidswallow.
@@ -50,27 +51,13 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 4) windows needed to have `_NET_WM_PID`.
 
 
-## Using with bspwm.
-
 1) Add `pidswallow` to your path.
-2) Add the following line at the end of your bspwmrc. (`~/.config/bspwmrc`)
+2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
 ```bash
 pidswallow --loop &
 ```
 3) Restart wm.
-
-## Other wm
-* you need to run this script whenever a new window launches with the window id.
-(use some sort of event monitor/subscription)
-
-```shell
-pidswallow <window-id>
-```
-
-* Need to provide some way to hide the window. (or maybe minimize them).
-Look into your window manager manual/docs or use `xdotool`. (ex: you can use xdotool to minimise/hide in gnome).
-* Change `#*` lines in the script with your preferred way of hiding windows.
 
 ## Blacklisting
 If you want to blacklist some program you need to black list their process name. (obtained from top/ps). To the black list variable [space separated].
