@@ -25,7 +25,7 @@ vomit() {
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
         xdotool windowmap "$pwid"
-        xprop -id "$cwid" >/dev/null 2>&1 || xdotool windowactivate "$pwid"
+        xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 }
