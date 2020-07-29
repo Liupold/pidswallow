@@ -15,8 +15,8 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 "
-swallowable=" $TERMINAL urxvt kitty alacritty konsole "
-blacklist=" $swallowable "
+swallowable=" $TERMINAL urxvt kitty alacritty konsole $PIDSWALLOW_SWALLOWABLE "
+blacklist=" $swallowable $PIDSWALLOW_BLACKLIST "
 verbose=0
 glue=0
 
