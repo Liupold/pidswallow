@@ -64,6 +64,9 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 
 * bspwm
 * i3
+* gnome
+* openbox
+* plasma (kde-plasma)
 
 ## Blacklisting
 If you want to blacklist some program you need to black list their process name. (obtained from top/ps).
