@@ -20,8 +20,9 @@ OPTIONS:
         -s  --swallow <CWID>    Hides parent window of the given child window id.
         -v  --vomit <CWID>      Unhides parent window of the given child window id.
         -t  --toggle <CWID>     toggle between swallow and vomit. (default)
+        -g  --glue              treat if parent and child window are same. (recommended)
         -l  --loop              listen and hide / unhide window on launch / remove.
-        -V  --verbose           Shows usefull information.
+        -V  --verbose           Shows useful information.
 
 bugs/issues: https://github.com/liupold/pidswallow.
 ```
@@ -54,7 +55,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
 ```bash
-pgrep -fl 'pidswallow --loop' || pidswallow --loop
+pgrep -fl 'pidswallow -gl' || pidswallow -gl
 ```
 3) Restart wm.
 
