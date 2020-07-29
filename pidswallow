@@ -89,6 +89,8 @@ swallow() {
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
 
+        eval "$PIDSWALLOW_PREGLUE_HOOK"
+
         ppos=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
 
