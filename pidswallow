@@ -45,10 +45,6 @@ vomit() {
                 && cpos=$(cat /tmp/swallowed-by-"$cwid"-pos) && \
                 xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
 
-        echo "$cpos"
-        echo "$csize"
-
-
         rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
                 "/tmp/swallowed-by-$cwid-desk"
 }
@@ -71,9 +67,13 @@ swallow() {
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
 
-        for parent in $(pstree -ATlsp "$cpid" \
+        family_tree="$(pstree -ATlsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
-                -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac); do
+                -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac)"
+
+        [ "$verbose" -eq 1 ] && echo "$family_tree"
+
+        for parent in $family_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
                         && ppid="${parent##*:}" && break
