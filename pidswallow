@@ -49,8 +49,8 @@ vomit() {
         echo "$csize"
 
 
-        #rm -f "/tmp/swallowed-by-$cwid-pos"
-        #rm -f "/tmp/swallowed-by-$cwid-size"
+        rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
+                "/tmp/swallowed-by-$cwid-desk"
 }
 
 
@@ -108,7 +108,7 @@ swallow() {
                 [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
                 [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
                 [ -n "$desk" ] && echo "$desk" > "/tmp/swallowed-by-$cwid-desk"
-        done } &
+        done } 2>/dev/null &
 }
 
 toggle() {
