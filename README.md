@@ -59,6 +59,14 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 ```
 3) Restart wm.
 
+## Additional Configuration
+The following environment variables can be exported to change the behavior of pidswallow.
+They are evaluated through shell (`eval`), so most expressions should work. The special variables `$pwid` and `$cwid` hold the parent and child window IDs, respectively.
+
+* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdotool windowunmap --sync "$pwid"`
+* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdotool windowmap --sync "$pwid"`
+* `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
+
 ## Tested on
 *(If you did please let me know, If it dosent work create a issue).*
 
@@ -81,8 +89,8 @@ To the `blacklist` variable [space separated].
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
 
-## Tricks.
-* ### Manual swallow (toggle)
+## Tricks
+### Manual swallow (toggle)
 
 1) Add `pidswallow` to your path.
 2) run this and click on the child window (not the term) to swallow.
@@ -96,7 +104,25 @@ super + v
     pidswallow -t "0x$(echo "ibase=10;obase=16; $(xdotool getwindowfocus)" | bc)"
 ```
 
-* Launch a program from term wihout being swallowed.
+### Launch a program from term wihout being swallowed.
 ```
 setsid -f <command>  # this will not swallow the terminal.
 ```
+
+## WM specific recommendations
+### bspwm
+Add each set of lines to your `bspwmrc`, right before running pidswallow.
+* Let bspwm handle window hiding.
+```
+export PIDSWALLOW_SWALLOW_COMMAND='bspc node "pwid" --flag hidden=on'
+export PIDSWALLOW_VOMIT_COMMAND='bspc node "pwid" --flag hidden=off'
+```
+This way bspwm will remember window positions and won't lose track of swallowed windows.
+
+* Follow `floating` state of parent (when using `--glue`).
+```
+export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n "$pwid".floating >/dev/null && bspc node "$cwid" --state floating'
+```
+Check if parent window state is `floating` and apply the same to the child if that's the case.
+This example should work in most cases, but feel free to add more complex hooks to your setup. (e.g. to mimic more properties of the parent).
+
