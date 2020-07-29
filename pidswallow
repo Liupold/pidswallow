@@ -17,6 +17,10 @@ bugs/issues: https://github.com/liupold/pidswallow.
 "
 swallowable=" $TERMINAL urxvt kitty alacritty konsole $PIDSWALLOW_SWALLOWABLE "
 blacklist=" $swallowable $PIDSWALLOW_BLACKLIST "
+# shellcheck disable=SC2016 # having "$pwid" unexpanded is intentional
+swallow_command=${PIDSWALLOW_SWALLOW_COMMAND:-'xdotool windowunmap --sync "$pwid"'}
+# shellcheck disable=SC2016
+vomit_command=${PIDSWALLOW_VOMIT_COMMAND:-'xdotool windowmap --sync "$pwid"'}
 verbose=0
 glue=0
 
@@ -26,7 +30,7 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        xdotool windowmap "$pwid"
+        eval "$vomit_command"
         xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
@@ -80,7 +84,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
-        xdotool windowunmap --sync "$pwid"
+        eval "$swallow_command"
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
