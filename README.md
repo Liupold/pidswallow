@@ -123,6 +123,7 @@ This way bspwm will remember window positions and won't lose track of swallowed 
 * Follow `floating` state of parent (when using `--glue`).
 
 ```bash
+# not working
 export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n {%pwid}.floating >/dev/null && bspc node {%cwid} --state floating'
 ```
 Check if parent window state is `floating` and apply the same to the child if that's the case.
