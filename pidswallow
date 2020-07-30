@@ -28,8 +28,10 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        # shellcheck disable=SC2091
-        $(echo "$vomit_command" | sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")
+
+        eval "$(echo "$vomit_command" | \
+                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")"
+
         xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
@@ -84,16 +86,15 @@ swallow() {
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
 
-        # shellcheck disable=SC2091
-        $(echo "$swallow_command" | sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")
+        eval "$(echo "$swallow_command" | \
+                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")"
 
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
 
-        # shellcheck disable=SC2091
-        $(echo "$PIDSWALLOW_PREGLUE_HOOK" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")
+        eval "$(echo "$PIDSWALLOW_PREGLUE_HOOK" | \
+                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")"
 
         ppos=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
