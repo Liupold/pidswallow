@@ -114,8 +114,8 @@ setsid -f <command>  # this will not swallow the terminal.
 Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
 ```
-export PIDSWALLOW_SWALLOW_COMMAND='bspc node "pwid" --flag hidden=on'
-export PIDSWALLOW_VOMIT_COMMAND='bspc node "pwid" --flag hidden=off'
+export PIDSWALLOW_SWALLOW_COMMAND='bspc node "$pwid" --flag hidden=on'
+export PIDSWALLOW_VOMIT_COMMAND='bspc node "$pwid" --flag hidden=off'
 ```
 This way bspwm will remember window positions and won't lose track of swallowed windows.
 
