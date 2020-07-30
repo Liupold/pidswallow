@@ -65,10 +65,10 @@ swallow() {
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
         [ "$verbose" -eq 1 ] && printf '%s' "swallow - Scanning process tree: " && pstree -ATlsp "$cpid" | head -n 1
-        family_tree="$(pstree -ATlsp "$cpid" \
+        process_tree="$(pstree -ATlsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
                 -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac)"
-        for parent in $family_tree; do
+        for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
                         && ppid="${parent##*:}" && break
