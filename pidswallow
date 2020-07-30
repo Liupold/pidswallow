@@ -28,28 +28,22 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-
         echo "$vomit_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
-
-        xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
+        xprop -id "$cwid" >/dev/null 2>&1 && \
+                xdotool windowactivate "$cwid" && xdotool set_desktop "$desk"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-
         [ "$glue" -eq  0 ] && return 0
-
         [ -f "/tmp/swallowed-by-$cwid-desk" ] \
                 && desk=$(cat /tmp/swallowed-by-"$cwid"-desk) && \
-                xdotool set_desktop_for_window "$pwid" "$desk"
-
+                xdotool set_desktop_for_window "$pwid" "$desk" &&
         [ -f "/tmp/swallowed-by-$cwid-size" ] \
                 && csize=$(cat /tmp/swallowed-by-"$cwid"-size) && \
                 xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
-
         [ -f "/tmp/swallowed-by-$cwid-pos" ] \
                 && cpos=$(cat /tmp/swallowed-by-"$cwid"-pos) && \
                 xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
-
         rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
                 "/tmp/swallowed-by-$cwid-desk"
 }
@@ -64,19 +58,15 @@ swallow() {
         unset cwid pwid cname pname ppid cpid # similar to local.
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
-
         cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)" || return "2$?"
         [ "${cpid#*not found*}" != "$cpid" ] && return 3 # window didn't have _NET_WM_PID
         cpid="${cpid##* }"
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
-
         family_tree="$(pstree -ATlsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
                 -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac)"
-
         [ "$verbose" -eq 1 ] && echo "$family_tree"
-
         for parent in $family_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
@@ -91,19 +81,14 @@ swallow() {
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
-
         echo "$PIDSWALLOW_PREGLUE_HOOK" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
-
         ppos=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
-
         psize=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+x[0-9]\+' | tr 'x' ' ')
-
         xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }"
         xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }"
-
         { xprop -spy -id "$cwid" | while read -r _; do
                 [ ! -f "/tmp/swallowed-by-$cwid" ] && exit
                 cgeo="$(xdotool getwindowgeometry "$cwid")"
@@ -133,21 +118,16 @@ toggle() {
 
 loop() {
         prev_event="$(xprop -root  _NET_CLIENT_LIST)"
-
         xprop -spy -root  _NET_CLIENT_LIST | while read -r event; do
                 unset node_added node_removed
-
                 for wid in $(echo "${event##*# }" | tr -d ','); do
                         [ "${prev_event#*$wid}" = "$prev_event" ] \
                                 && node_added="$wid" && break
                 done
-
-
                 for wid in $(echo "${prev_event##*# }" | tr -d ','); do
                         [ "${event#*$wid}" = "$event" ] \
                                 && node_removed="$wid" && break
                 done
-
                 prev_event="$event"
                 # [ -z "${node_added}${node_removed}" ] && continue
                 [ -n "$node_added" ] && swallow "$node_added"
@@ -162,7 +142,6 @@ loop() {
 TEMP=$(getopt -o 'Vghlt:s:v:' --long 'verbose,glue,help,loop,toggle:,swallow:,vomit:' \
         -n 'pidswallow' -- "$@")
 eval set -- "${TEMP}"; unset TEMP
-
 while true; do
         case "$1" in
                 '-h' | '--help' )
@@ -192,12 +171,9 @@ while true; do
                         echo "$usage" && exit 1;;
         esac
 done
-
 # toggle WID on first non-flag argument
 [ -n "$*" ] && toggle "$1" && shift
-
 # error if there's more than one non-flag argument
 if [ -n "$*" ]; then
-        echo "Unrecognized trailing option '$*'" >&2
-        exit 1
+        echo "Unrecognized trailing option '$*'" >&2; exit 1
 fi
