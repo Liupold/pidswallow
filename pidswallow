@@ -31,7 +31,7 @@ vomit() {
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
         eval "$vomit_command"
-        xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
+        xdotool windowactivate "$cwid" >/dev/null 2>&1 || xdotool windowactivate "$pwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 
