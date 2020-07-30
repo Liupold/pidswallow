@@ -110,7 +110,7 @@ super + v
 setsid -f <command>  # this will not swallow the terminal.
 ```
 
-## WM specific recommendations
+## WM specific recommendations (experimental)
 ### bspwm
 Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
