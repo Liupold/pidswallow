@@ -28,11 +28,12 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
+        [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomiting $pwid using $vomit_command"
         echo "$vomit_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
         xprop -id "$cwid" >/dev/null 2>&1 && \
                 xdotool windowactivate "$cwid" && xdotool set_desktop "$desk"
-        [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
+        [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
         [ -f "/tmp/swallowed-by-$cwid-desk" ] \
@@ -63,22 +64,23 @@ swallow() {
         cpid="${cpid##* }"
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
+        [ "$verbose" -eq 1 ] && printf '%s' "swallow - Scanning process tree: " && pstree -ATlsp "$cpid" | head -n 1
         family_tree="$(pstree -ATlsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
                 -e 's|---|\n|g' -e 's|-+-|\n|g' -e '1p' | tac)"
-        [ "$verbose" -eq 1 ] && echo "$family_tree"
         for parent in $family_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
                         && ppid="${parent##*:}" && break
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
+        [ "$verbose" -eq 1 ] && echo "swallow - $pname($ppid) detected as swallowable"
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
-
+        [ "$verbose" -eq 1 ] && echo "swallow - $cwid swallowing $pwid using $swallow_command"
         echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
 
-        [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
+        [ "$verbose" -eq 1 ] && echo "swallow - $cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
         echo "$PIDSWALLOW_PREGLUE_HOOK" | \
