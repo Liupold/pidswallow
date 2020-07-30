@@ -30,7 +30,7 @@ vomit() {
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-        eval "$vomit_command"
+        (eval "$vomit_command")
         xdotool windowactivate "$cwid" >/dev/null 2>&1 || xdotool windowactivate "$pwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
@@ -84,12 +84,12 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
-        eval "$swallow_command"
+        (eval "$swallow_command")
         [ "$verbose" -eq 1 ] && echo "$cname($cwid) swallowed $pname($pwid)"
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
 
-        eval "$PIDSWALLOW_PREGLUE_HOOK"
+        (eval "$PIDSWALLOW_PREGLUE_HOOK")
 
         ppos=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
