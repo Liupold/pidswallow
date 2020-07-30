@@ -24,16 +24,13 @@ verbose=0
 glue=0
 
 vomit() {
-        # focuses parent if child is dead.
         unset cwid pwid # similar to local
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
-
         # shellcheck disable=SC2091
         $(echo "$vomit_command" | sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")
-
-        xdotool windowactivate "$cwid" >/dev/null 2>&1 || xdotool windowactivate "$pwid"
+        xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
         [ "$verbose" -eq 1 ] && echo "$cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
 
@@ -94,7 +91,9 @@ swallow() {
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$glue" -eq  0 ] && return 0
 
-        (eval "$PIDSWALLOW_PREGLUE_HOOK")
+        # shellcheck disable=SC2091
+        $(echo "$PIDSWALLOW_PREGLUE_HOOK" | \
+                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g")
 
         ppos=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
