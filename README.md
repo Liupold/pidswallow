@@ -61,10 +61,10 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 
 ## Additional Configuration
 The following environment variables can be exported to change the behavior of pidswallow.
-They are evaluated through shell (`eval`), so most expressions should work. The special variables `$pwid` and `$cwid` hold the parent and child window IDs, respectively.
+They are evaluated through shell (sub shell), so most expressions should work. The special variables `{%pwid}` and `{%cwid}` hold the parent and child window IDs, respectively.
 
-* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdotool windowunmap --sync "$pwid"`
-* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdotool windowmap --sync "$pwid"`
+* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdotool windowunmap --sync {%pwid}`
+* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdotool windowmap --sync {%pwid}`
 * `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
 
 ## Tested on
@@ -113,15 +113,17 @@ setsid -f <command>  # this will not swallow the terminal.
 ### bspwm
 Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
-```
-export PIDSWALLOW_SWALLOW_COMMAND='bspc node "$pwid" --flag hidden=on'
-export PIDSWALLOW_VOMIT_COMMAND='bspc node "$pwid" --flag hidden=off'
+
+```bash
+export PIDSWALLOW_SWALLOW_COMMAND='bspc node {%pwid} --flag hidden=on'
+export PIDSWALLOW_VOMIT_COMMAND='bspc node {%pwid} --flag hidden=off'
 ```
 This way bspwm will remember window positions and won't lose track of swallowed windows.
 
 * Follow `floating` state of parent (when using `--glue`).
-```
-export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n "$pwid".floating >/dev/null && bspc node "$cwid" --state floating'
+
+```bash
+export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n {%pwid}.floating >/dev/null && bspc node {%cwid} --state floating'
 ```
 Check if parent window state is `floating` and apply the same to the child if that's the case.
 This example should work in most cases, but feel free to add more complex hooks to your setup. (e.g. to mimic more properties of the parent).
