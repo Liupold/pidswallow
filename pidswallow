@@ -78,7 +78,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         [ "$verbose" -eq 1 ] && echo "swallow - $pname($ppid) detected as swallowable"
-        pwid="$(xdotool search --pid "$ppid" 2>/dev/null | sed 1q) "
+        pwid="$(xdotool search --limit 1 --pid "$ppid" 2>/dev/null)"
         [ "$verbose" -eq 1 ] && echo "swallow - $cwid swallowing $pwid using $swallow_command"
         echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
