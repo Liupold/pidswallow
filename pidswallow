@@ -56,6 +56,7 @@ swallow() {
         # 2x -> xprop return a non zero exit code.(x is returned by xprop)
         # 3 -> window lacks a _NET_WM_PID property.
         # 4 -> window already swallowed
+        # 5 -> swallow_command failed
         unset cwid pwid cname pname ppid cpid # similar to local.
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
@@ -81,10 +82,10 @@ swallow() {
         pwid="$(xdotool search --limit 1 --onlyvisible --pid "$ppid")"
         [ "$verbose" -eq 1 ] && echo "swallow - $cwid swallowing $pwid using $swallow_command"
         echo "$swallow_command" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
-
-        [ "$verbose" -eq 1 ] && echo "swallow - $cname($cwid) swallowed $pname($pwid)"
+                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
+                return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
+        [ "$verbose" -eq 1 ] && echo "swallow - $cname($cwid) swallowed $pname($pwid)"
         [ "$glue" -eq  0 ] && return 0
         echo "$PIDSWALLOW_PREGLUE_HOOK" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
