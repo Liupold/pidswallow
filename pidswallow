@@ -15,7 +15,7 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 "
-swallowable=" $TERMINAL urxvt kitty alacritty konsole $PIDSWALLOW_SWALLOWABLE "
+swallowable=" $TERMINAL urxvt konsole xfce4-terminal $PIDSWALLOW_SWALLOWABLE "
 blacklist=" $swallowable $PIDSWALLOW_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdotool windowunmap --sync {%pwid\}}"
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdotool windowmap --sync {%pwid\}}"
@@ -67,8 +67,10 @@ swallow() {
         process_tree="$(pstree -ATlsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
                 -e 's|---|\n|g' -e 's|-+-|\n|g' -e 's/\n'"$cname"':'"$cpid"'.*//' -e '1p' | tac)"
-        [ "$verbose" -eq 1 ] && echo "swallow - Scanning process tree of $cname($cpid): $process_tree" | \
-            paste -s -d ' ' # put it all together in a single verbose line
+        [ "$verbose" -eq 1 ] && \
+        echo "swallow - Scanning process tree of $cname($cpid): $process_tree" | \
+        paste -s -d ' ' # put it all together in a single verbose line
+
         for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
@@ -76,7 +78,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         [ "$verbose" -eq 1 ] && echo "swallow - $pname($ppid) detected as swallowable"
-        pwid="$(xdotool search --pid "$ppid" 2>/dev/null)"
+        pwid="$(xdotool search --pid "$ppid" 2>/dev/null | sed 1q) "
         [ "$verbose" -eq 1 ] && echo "swallow - $cwid swallowing $pwid using $swallow_command"
         echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
