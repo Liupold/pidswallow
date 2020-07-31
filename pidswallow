@@ -53,16 +53,13 @@ swallow() {
         # return values
         # 0 -> Found and swallowed
         # 1 -> No swallowable window found.
-        # 2x -> xprop return a non zero exit code.(x is returned by xprop)
         # 3 -> window lacks a _NET_WM_PID property.
         # 4 -> window already swallowed
         # 5 -> swallow_command failed
         unset cwid pwid cname pname ppid cpid # similar to local.
         cwid="$1"
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
-        cpid="$(xprop _NET_WM_PID -id "$cwid" 2>/dev/null)" || return "2$?"
-        [ "${cpid#*not found*}" != "$cpid" ] && return 3 # window didn't have _NET_WM_PID
-        cpid="${cpid##* }"
+        cpid="$(xdotool getwindowpid "$cwid" 2>/dev/null)" || return 3
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
         process_tree="$(pstree -ATlsp "$cpid" \
