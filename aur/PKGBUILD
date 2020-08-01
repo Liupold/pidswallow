@@ -18,10 +18,8 @@ makedepends=(git)
 checkdepends=(shellcheck)
 provides=(pidswallow)
 
-# changelog="Initial stable release."
 source=("$pkgname-$pkgver::https://github.com/Liupold/pidswallow/archive/$pkgver.tar.gz")
 sha256sums=("1ad08b49c9a9502bff47fd58df8b5a06252f7d349a8cdf4105932a77232adb69")
-# validpgpkeys=()
 
 
 check() {
