@@ -24,14 +24,15 @@ jobs:
       run: .github/update-pkgbuild.sh
   build-dev:
     needs: make-pkgbuild
+    runs-on: ubuntu-latest
     container:
       image: archlinux
       options: --privileged
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup
-      steps:
-      - uses: FFY00/build-arch-package@v1
-      - name: Build pidswallow from PKGBUILD.
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Arch Linux package
+        uses: FFY00/build-arch-package@master
         with:
-         PKGBUILD: aur/git/PKGBUILD
-
+          PKGBUILD: $GITHUB_WORKSPACE/.github/aur/git/PKGBUILD
