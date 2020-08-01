@@ -15,11 +15,23 @@ jobs:
     - uses: actions/checkout@master
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
-  build:
-    runs-on: ubuntu-18.04
+  make-pkgbuild:
+    name: Shellcheck
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Archlinux
-      run: curl -L https://github.com/zaoqi/github-actions-archlinux/raw/master/install.sh | sh
-    - name: Build and Test PKGBUILD.
-      run: .github/pkg-build.sh
+    - uses: actions/checkout@master
+    - name: make pkgbuild from template
+      run: .github/update-pkgbuild.sh
+  build-dev:
+    needs: make-pkgbuild
+    container:
+      image: archlinux
+      options: --privileged
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup
+      steps:
+        - name: Build pidswallow (PKGBUILD ArchLinux).
+        uses: FFY00/build-arch-package@v1
+        with:
+          PKGBUILD: aur/git/PKGBUILD
+
