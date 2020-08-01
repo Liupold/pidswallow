@@ -83,15 +83,6 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 * Xfce
 * herbstluftwm (by [cbf305](https://github.com/cbf305))
 
-## Blacklisting
-If you want to blacklist some program you need to black list their process name. (obtained from top/ps).
-To the `blacklist` variable [space separated].
-
-* no need to blacklist xev (xev will not be swallowed because it lacks `_NET_WM_PID`)
-
-## Adding Terminals
-* you can change the `swallowable` var to add term. (by default $TERMINAL is added).
-
 ## Knows Issues
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
