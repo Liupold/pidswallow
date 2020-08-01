@@ -15,11 +15,12 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 "
-swallowable=" $TERMINAL urxvt konsole xfce4-terminal $PIDSWALLOW_SWALLOWABLE "
-blacklist=" $swallowable $PIDSWALLOW_BLACKLIST "
+swallowable=" ${PIDSWALLOW_SWALLOWABLE:-"alacritty urxvt konsole xfce4-terminal"} "
+blacklist=" ${PIDSWALLOW_BLACKLIST:-"$swallowable"} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdotool windowunmap --sync {%pwid\}}"
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdotool windowmap --sync {%pwid\}}"
+glue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
 verbose=0
 glue=0
@@ -85,7 +86,7 @@ swallow() {
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$verbose" -eq 1 ] && echo "swallow - $cname($cwid) swallowed $pname($pwid)"
         [ "$glue" -eq  0 ] || [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
-        echo "$PIDSWALLOW_PREGLUE_HOOK" | \
+        echo "$preglue_hook" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
         ppos=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')

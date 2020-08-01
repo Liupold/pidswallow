@@ -60,9 +60,14 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 3) Restart wm.
 
 ## Additional Configuration
-The following environment variables can be exported to change the behavior of pidswallow.
-They are evaluated through shell (sub shell), so most expressions should work. The special variables `{%pwid}` and `{%cwid}` hold the parent and child window IDs, respectively.
+Environment variables can be exported to change the behavior of pidswallow.
 
+The following ones accept lists of space separated process names.
+* `PIDSWALLOW_SWALLOWABLE`: can be swallowed by pidswallow (e.g. your terminal). Default: "alacritty urxvt konsole xfce4-terminal"
+* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed. Default: copy from `$PIDSWALLOW_SWALLOWABLE`
+* `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
+
+The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
 * `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdotool windowunmap --sync {%pwid}`
 * `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdotool windowmap --sync {%pwid}`
 * `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
