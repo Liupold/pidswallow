@@ -20,7 +20,7 @@ blacklist=" ${PIDSWALLOW_BLACKLIST:-"$swallowable"} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdotool windowunmap --sync {%pwid\}}"
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdotool windowmap --sync {%pwid\}}"
-glue_hook="$PIDSWALLOW_PREGLUE_HOOK"
+preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
 verbose=0
 glue=0
