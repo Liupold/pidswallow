@@ -3,6 +3,7 @@
 
 Super easy to config. Uses `xdoool` WM/DE independent.
 
+![CI](https://github.com/Liupold/pidswallow/workflows/CI/badge.svg)
 
 ## Features
 * Based on process hierarchy (don't care about window focus).
