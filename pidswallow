@@ -70,7 +70,6 @@ swallow() {
         [ "$verbose" -eq 1 ] && \
         echo "swallow - Scanning process tree of $cname($cpid): $process_tree" | \
         paste -s -d ' ' # put it all together in a single verbose line
-
         for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
@@ -79,6 +78,7 @@ swallow() {
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         [ "$verbose" -eq 1 ] && echo "swallow - $pname($ppid) detected as swallowable"
         pwid="$(xdotool search --limit 1 --onlyvisible --pid "$ppid")"
+        [ -z "$pwid" ] && return 4
         [ "$verbose" -eq 1 ] && echo "swallow - $cwid swallowing $pwid using $swallow_command"
         echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
