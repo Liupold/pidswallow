@@ -15,15 +15,7 @@ jobs:
     - uses: actions/checkout@master
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
-  make-pkgbuild:
-    name: Shellcheck
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: make pkgbuild from template
-      run: .github/make-pkgbuild.sh
   build-dev:
-    needs: make-pkgbuild
     runs-on: ubuntu-latest
     container:
       image: archlinux
@@ -31,8 +23,13 @@ jobs:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup
     steps:
+      - uses: actions/checkout@master
+      - name: make pkgbuild from template
+        run: .github/make-pkgbuild.sh
+
       - uses: actions/checkout@v2
       - name: Build Arch Linux package
         uses: FFY00/build-arch-package@master
         with:
-          PKGBUILD: $GITHUB_WORKSPACE/aur/git/PKGBUILD
+          PKGBUILD: aur/git/PKGBUILD
+          OUTDIR: $HOME/arch-packages
