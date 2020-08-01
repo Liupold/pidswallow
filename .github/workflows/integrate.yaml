@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: make pkgbuild from template
-      run: .github/update-pkgbuild.sh
+      run: .github/make-pkgbuild.sh
   build-dev:
     needs: make-pkgbuild
     runs-on: ubuntu-latest
