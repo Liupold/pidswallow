@@ -17,6 +17,7 @@ bugs/issues: https://github.com/liupold/pidswallow.
 "
 swallowable=" $TERMINAL urxvt konsole xfce4-terminal $PIDSWALLOW_SWALLOWABLE "
 blacklist=" $swallowable $PIDSWALLOW_BLACKLIST "
+glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdotool windowunmap --sync {%pwid\}}"
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdotool windowmap --sync {%pwid\}}"
 
@@ -35,7 +36,7 @@ vomit() {
                 xdotool windowactivate "$cwid" && xdotool set_desktop "$desk"
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-        [ "$glue" -eq  0 ] && return 0
+        [ "$glue" -eq  0 ] || [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
         [ -f "/tmp/swallowed-by-$cwid-desk" ] \
                 && desk=$(cat /tmp/swallowed-by-"$cwid"-desk) && \
                 xdotool set_desktop_for_window "$pwid" "$desk" &&
@@ -83,7 +84,7 @@ swallow() {
                 return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         [ "$verbose" -eq 1 ] && echo "swallow - $cname($cwid) swallowed $pname($pwid)"
-        [ "$glue" -eq  0 ] && return 0
+        [ "$glue" -eq  0 ] || [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
         echo "$PIDSWALLOW_PREGLUE_HOOK" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
         ppos=$(xdotool getwindowgeometry "$pwid" | \
