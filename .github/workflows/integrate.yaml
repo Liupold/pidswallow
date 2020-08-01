@@ -30,8 +30,8 @@ jobs:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup
       steps:
-        - name: Build pidswallow (PKGBUILD ArchLinux).
-        uses: FFY00/build-arch-package@v1
-        with:
-          PKGBUILD: aur/git/PKGBUILD
+        - name: Build pidswallow from PKGBUILD.
+          uses: FFY00/build-arch-package@v1
+          with:
+            PKGBUILD: aur/git/PKGBUILD
 
