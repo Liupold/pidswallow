@@ -23,10 +23,6 @@ jobs:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup
     steps:
-      - uses: actions/checkout@master
-      - name: make pkgbuild from template
-        run: .github/make-pkgbuild.sh
-
       - uses: actions/checkout@v2
       - name: Build Arch Linux package
         uses: FFY00/build-arch-package@master
