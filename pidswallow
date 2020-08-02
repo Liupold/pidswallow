@@ -50,9 +50,9 @@ vomit() {
                 csize=$(cat /tmp/swallowed-by-"$cwid"-size)
                 [ -n "$csize" ] && \
                         xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
-                rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
-                        "/tmp/swallowed-by-$cwid-desk"
         fi
+        rm -f "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
+                "/tmp/swallowed-by-$cwid-desk"
 
         xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
 
