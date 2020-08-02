@@ -56,7 +56,7 @@ vomit() {
                 "/tmp/swallowed-by-$cwid-desk"
         }
 
-        xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
+        xdotool windowactivate "$cwid" 2>/dev/null # if child still exists, re-focus it
 
 }
 
