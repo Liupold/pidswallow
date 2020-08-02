@@ -1,4 +1,4 @@
-name: 'PKBUILD tester.'
+name: 'PKBUILD'
 
 on:
   push:

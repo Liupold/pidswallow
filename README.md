@@ -3,8 +3,9 @@
 
 Super easy to config. Uses `xdoool` WM/DE independent.
 
-![CI](https://github.com/Liupold/pidswallow/workflows/CI/badge.svg)
-
+[![PKGBUILD-STATUS](https://github.com/Liupold/pidswallow/workflows/PKBUILD/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22PKBUILD%22)
+[![SHELLCHECK-STATUS](https://github.com/Liupold/pidswallow/workflows/shellcheck/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22shellcheck%22)
+[![license](https://img.shields.io/github/license/liupold/pidswallow.svg)](https://github.com/liupold/pidswallow/blob/master/LICENSE)
 ## Features
 * Based on process hierarchy (don't care about window focus).
 * cli like options. (super easy to use within scripts).
