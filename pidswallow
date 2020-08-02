@@ -38,16 +38,16 @@ vomit() {
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ]; then
-                desk=$(cat /tmp/swallowed-by-"$cwid"-desk)
+                desk=$(cat /tmp/swallowed-by-"$cwid"-desk 2>/dev/null)
                 [ -n "$desk" ] && \
                         [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
                         xdotool set_desktop_for_window "$pwid" "$desk"
 
-                cpos=$(cat /tmp/swallowed-by-"$cwid"-pos)
+                cpos=$(cat /tmp/swallowed-by-"$cwid"-pos 2>/dev/null)
                 [ -n "$cpos" ] && \
                         xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
 
-                csize=$(cat /tmp/swallowed-by-"$cwid"-size)
+                csize=$(cat /tmp/swallowed-by-"$cwid"-size 2>/dev/null)
                 [ -n "$csize" ] && \
                         xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
         fi
