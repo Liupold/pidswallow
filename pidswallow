@@ -22,6 +22,7 @@ swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdotool windowunmap --sync {%pwid
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdotool windowmap --sync {%pwid\}}"
 preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
+action=toggle
 verbose=0
 glue=0
 
@@ -144,7 +145,7 @@ loop() {
 [ -p /dev/stdin ] && eval set -- "$* $(cat /dev/stdin)" # basic pipe support
 [ "$#" -eq 0 ] && echo "$usage" && exit 1
 
-TEMP=$(getopt -o 'Vghlt:s:v:' --long 'verbose,glue,help,loop,toggle:,swallow:,vomit:' \
+TEMP=$(getopt -o 'Vghltsv' --long 'verbose,glue,help,loop,toggle,swallow,vomit' \
         -n 'pidswallow' -- "$@")
 eval set -- "${TEMP}"; unset TEMP
 while true; do
@@ -159,16 +160,16 @@ while true; do
                         glue=1
                         shift; continue;;
                 '-t'|'--toggle')
-                        toggle "$2" || exit "$?"
-                        shift 2; continue;;
+                        action=toggle
+                        shift; continue;;
                 '-s'|'--swallow')
-                        swallow "$2" || exit "$?"
-                        shift 2; continue;;
+                        action=swallow
+                        shift; continue;;
                 '-v'|'--vomit')
-                        vomit "$2" || exit "$?"
-                        shift 2; continue;;
+                        action=vomit
+                        shift; continue;;
                 '-l'|'--loop')
-                        loop || exit "$?"
+                        action=loop
                         shift; continue;;
                 '--')
                         shift; break;;
@@ -177,9 +178,26 @@ while true; do
                         echo "$usage" && exit 1;;
         esac
 done
-# toggle WID on first non-flag argument
-[ -n "$*" ] && toggle "$1" && shift
+
+case "$action" in
+        'toggle')
+                [ -z "$1" ] && echo "$usage" && exit 1
+                toggle "$1"
+                ;;
+        'swallow')
+                [ -z "$1" ] && echo "$usage" && exit 1
+                swallow "$1"
+                ;;
+        'vomit')
+                [ -z "$1" ] && echo "$usage" && exit 1
+                vomit "$1"
+                ;;
+        'loop')
+                loop
+                ;;
+esac
+
 # error if there's more than one non-flag argument
-if [ -n "$*" ]; then
-        echo "Unrecognized trailing option '$*'" >&2; exit 1
+if [ -n "$1" ]; then
+        echo "Invalid argument '$1'" >&2; exit 1
 fi
