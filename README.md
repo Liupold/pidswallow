@@ -3,7 +3,9 @@
 
 Super easy to config. Uses `xdoool` WM/DE independent.
 
-
+[![PKGBUILD-STATUS](https://github.com/Liupold/pidswallow/workflows/PKBUILD/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22PKBUILD%22)
+[![SHELLCHECK-STATUS](https://github.com/Liupold/pidswallow/workflows/shellcheck/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22shellcheck%22)
+[![license](https://img.shields.io/github/license/liupold/pidswallow.svg)](https://github.com/liupold/pidswallow/blob/master/LICENSE)
 ## Features
 * Based on process hierarchy (don't care about window focus).
 * cli like options. (super easy to use within scripts).
@@ -51,6 +53,19 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 3) windows needed to have `_NET_WM_PID`.
 
 ## Installation
+
+### Using AUR
+* stable release. (Currently on 1.0)
+
+```bash
+yay -S pidswallow
+```
+
+* dev (git)
+```bash
+yay -S pidswallow-dev-git
+```
+### Manual
 1) Add `pidswallow` to your path.
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
