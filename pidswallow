@@ -146,11 +146,11 @@ loop() {
 
 TEMP=$(getopt -o 'Vghlt:s:v:' --long 'verbose,glue,help,loop,toggle:,swallow:,vomit:' \
         -n 'pidswallow' -- "$@")
-eval set -- "${TEMP}"; unset TEMP
+
+# precheck
+eval set -- "${TEMP}"
 while true; do
         case "$1" in
-                '-h' | '--help' )
-                        echo "$usage" && exit 0;;
                 '-V'|'--verbose')
                         verbose=1
                         [ "$verbose" -eq 1 ] && echo "SWALLOWABLE: \"$swallowable\""
@@ -158,6 +158,22 @@ while true; do
                 '-g'|'--glue')
                         glue=1
                         shift; continue;;
+                '--')
+                        shift; break;;
+                *)
+                        shift; continue;;
+        esac
+done
+
+eval set -- "${TEMP}"; unset TEMP
+while true; do
+        case "$1" in
+                '-V'|'--verbose')
+                        shift; continue;;
+                '-g'|'--glue')
+                        shift; continue;;
+                '-h' | '--help' )
+                        echo "$usage" && exit 0;;
                 '-t'|'--toggle')
                         toggle "$2" || exit "$?"
                         shift 2; continue;;
