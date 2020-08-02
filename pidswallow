@@ -119,7 +119,7 @@ swallow() {
 }
 
 toggle() {
-        cwid="$1"
+        cwid=$(printf "%d\n" "$1") # decimal conversion
         [ "$glue" -eq 1 ] && 'toggle is not supported/needed with --glue' && exit 1
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
                 vomit "$cwid"
