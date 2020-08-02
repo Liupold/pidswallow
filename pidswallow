@@ -28,8 +28,8 @@ glue=0
 vomit() {
         unset cwid pwid # similar to local
         cwid=$(printf "%d\n" "$1") # decimal conversion
-        [ -f "/tmp/swallowed-by-$cwid" ] || return 1
-        pwid=$(cat "/tmp/swallowed-by-$cwid")
+        pwid=$(cat "/tmp/swallowed-by-$cwid" 2>/dev/null)
+        [ -n "$pwid" ] || return 1
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomiting $pwid using $vomit_command"
         echo "$vomit_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
