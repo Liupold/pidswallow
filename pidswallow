@@ -27,7 +27,7 @@ glue=0
 
 vomit() {
         unset cwid pwid # similar to local
-        cwid="$1"
+        cwid=$(printf "%d\n" "$1") # decimal conversion
         [ -f "/tmp/swallowed-by-$cwid" ] || return 1
         pwid=$(cat "/tmp/swallowed-by-$cwid")
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomiting $pwid using $vomit_command"
@@ -59,7 +59,7 @@ swallow() {
         # 4 -> window already swallowed
         # 5 -> swallow_command failed
         unset cwid pwid cname pname ppid cpid # similar to local.
-        cwid="$1"
+        cwid=$(printf "%d\n" "$1") # decimal conversion
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
         cpid="$(xdotool getwindowpid "$cwid" 2>/dev/null)" || return 3
         cname="$(ps -p "$cpid" -o comm=)"

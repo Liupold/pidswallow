@@ -28,11 +28,14 @@ bugs/issues: https://github.com/liupold/pidswallow.
 ```
 * Just pass in the window id of the swallower.
 * Work on a toggle mode. (swallow if not swallowed else vomit).
-* Super fast. (Really!) (0.02s) (faster than before).
+* Super fast. (Really!) (0.04s) (worst case).
 
 ```
-pidswallow '0x04800003'  0.02s user 0.04s system 107% cpu 0.058 total (swallow)
-pidswallow '0x04800003'  0.01s user 0.01s system 71% cpu 0.032 total (vomit)
+$ time pidswallow -t 29360131
+pidswallow 29360131  0.04s user 0.03s system 115% cpu 0.060 total (swallow)
+
+$ time pidswallow -t 29360131
+pidswallow 29360131  0.03s user 0.01s system 83% cpu 0.048 total (vomit)
 ```
 
 ## Demo
@@ -100,7 +103,7 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 
 ```
 super + v
-    pidswallow -t "0x$(echo "ibase=10;obase=16; $(xdotool getwindowfocus)" | bc)"
+    xdotool getwindowfocus | pidswallow -t
 ```
 
 ### Launch a program from term wihout being swallowed.
