@@ -103,7 +103,6 @@ swallow() {
         xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }"
         xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }"
         { xprop -spy -id "$cwid" | while read -r _; do
-                [ ! -f "/tmp/swallowed-by-$cwid" ] && exit
                 cgeo="$(xdotool getwindowgeometry "$cwid")"
 
                 cpos=$(echo "$cgeo" | \
@@ -120,6 +119,7 @@ swallow() {
 
 toggle() {
         cwid="$1"
+        [ "$glue" -eq 1 ] && 'toggle is not supported/needed with --glue' && exit 1
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
                 vomit "$cwid"
                 return "$?"
