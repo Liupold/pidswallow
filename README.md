@@ -75,13 +75,13 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 ## Tested on
 *(If you did please let me know, If it dosent work create a issue).*
 
-* bspwm
-* i3
-* gnome
-* openbox
-* plasma
-* Xfce
-* herbstluftwm (by [cbf305](https://github.com/cbf305))
+* [bspwm](https://github.com/baskerville/bspwm)
+* [i3](https://i3wm.org/)
+* [gnome](https://www.gnome.org/gnome-3/)
+* [openbox](http://openbox.org/wiki/Main_Page)
+* [plasma](https://kde.org/announcements/plasma5.0/)
+* [Xfce](https://www.xfce.org/)
+* [herbstluftwm](https://herbstluftwm.org/) (by [cbf305](https://github.com/cbf305))
 
 ## Knows Issues
 * `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
