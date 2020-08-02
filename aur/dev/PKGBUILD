@@ -25,7 +25,12 @@ sha256sums=("SKIP")
 
 pkgver() {
         cd "$pkgname" || return 1
-        git checkout dev > /dev/null 2>&1
+        {
+                git checkout dev
+                git stash
+                git pull
+        } >/dev/null 2>&1
+
         printf "2.0.d.r%s.%s" \
                 "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 
