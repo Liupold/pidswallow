@@ -8,7 +8,7 @@
 # Maintainer: liupold <rohhnch@protonmail.ch>
 
 pkgname=pidswallow-dev-git
-pkgrel=4
+pkgrel=5
 pkgver=2.0.d # dev
 pkgdesc="A script to swallow your terminal automatically"
 arch=(x86_64)
