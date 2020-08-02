@@ -69,7 +69,10 @@ yay -S pidswallow
 yay -S pidswallow-dev-git
 ```
 ### Manual
-1) Add `pidswallow` to your path.
+ Add `pidswallow` to your path.
+
+### Autostart
+
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
 ```bash
@@ -102,9 +105,16 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 * [herbstluftwm](https://herbstluftwm.org/) (by [cbf305](https://github.com/cbf305))
 
 ## Knows Issues
-* `sxiv` doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
+* <b>sxiv</b> doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
-* Wrong terminal is swallowed in Xfce: See [#WM specific recommendations/Xfce](#xfce)
+* By default, every <b>Xfce Terminal</b> is connected to the same D-Bus daemon. This makes it hard for pidswallow to see which terminal should be swallowed, since they all share the same PID.
+
+   -> As a workaround, you can edit the Xfce Terminal launcher to use the `--disable-server` flag:
+    - Open Application Finder
+    - Search for "Xfce Terminal"
+    - Right click the result that has "Terminal Emulator" as its description and click Edit
+    - Change the "Command" field to `xfce4-terminal --disable-server`
+    - Save
 
 ## Tricks
 ### Manual swallow (toggle)
@@ -126,7 +136,7 @@ super + v
 setsid -f <command>  # this will not swallow the terminal.
 ```
 
-## WM specific recommendations
+## WM specific recommendations (Experimental)
 ### bspwm
 Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
@@ -144,13 +154,4 @@ export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n {%pwid}.floating >/dev/null && 
 ```
 Check if parent window state is `floating` and apply the same to the child if that's the case.
 This example should work in most cases, but feel free to add more complex hooks to your setup. (e.g. to mimic more properties of the parent).
-
-### Xfce
-By default, every Xfce Terminal is connected to the same D-Bus daemon. This makes it hard for pidswallow to see which terminal should be swallowed, since they all share the same PID.
-As a workaround, you can edit the Xfce Terminal launcher to use the `--disable-server` flag:
-1. Open Application Finder
-2. Search for "Xfce Terminal"
-3. Right click the result that has "Terminal Emulator" as its description and click Edit
-4. Change the "Command" field to `xfce4-terminal --disable-server`
-5. Save
 
