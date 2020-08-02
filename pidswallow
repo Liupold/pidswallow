@@ -183,14 +183,17 @@ case "$action" in
         'toggle')
                 [ -z "$1" ] && echo "$usage" && exit 1
                 toggle "$1"
+                shift
                 ;;
         'swallow')
                 [ -z "$1" ] && echo "$usage" && exit 1
                 swallow "$1"
+                shift
                 ;;
         'vomit')
                 [ -z "$1" ] && echo "$usage" && exit 1
                 vomit "$1"
+                shift
                 ;;
         'loop')
                 loop
