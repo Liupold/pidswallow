@@ -1,0 +1,40 @@
+name: 'PKBUILD tester.'
+
+on:
+  push:
+    branch:
+      - dev
+  pull_request:
+    branch:
+      - dev
+
+jobs:
+  build-dev:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Arch Linux package (dev)
+        uses: FFY00/build-arch-package@master
+        with:
+          PKGBUILD: $GITHUB_WORKSPACE/aur/dev/PKGBUILD
+          OUTDIR: $HOME/arch-packages
+
+  build-stable:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Arch Linux package (stable)
+        uses: FFY00/build-arch-package@master
+        with:
+          PKGBUILD: $GITHUB_WORKSPACE/aur/stable/PKGBUILD
+          OUTDIR: $HOME/arch-packages
