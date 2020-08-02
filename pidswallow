@@ -37,24 +37,22 @@ vomit() {
 
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-        [ "$glue" -eq  1 ] && \
-                [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ] && \
-        {
+        if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ]; then
+                desk=$(cat /tmp/swallowed-by-"$cwid"-desk)
+                [ -n "$desk" ] && \
+                        [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
+                        xdotool set_desktop_for_window "$pwid" "$desk"
 
-        [ -f "/tmp/swallowed-by-$cwid-desk" ] \
-                && desk=$(cat /tmp/swallowed-by-"$cwid"-desk) && \
-                [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
-                xdotool set_desktop_for_window "$pwid" "$desk"
-        [ -f "/tmp/swallowed-by-$cwid-pos" ] \
-                && cpos=$(cat /tmp/swallowed-by-"$cwid"-pos) && \
-                xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
-        [ -f "/tmp/swallowed-by-$cwid-size" ] \
-                && csize=$(cat /tmp/swallowed-by-"$cwid"-size) && \
-                xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
+                cpos=$(cat /tmp/swallowed-by-"$cwid"-pos)
+                [ -n "$cpos" ] && \
+                        xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
 
-        rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
-                "/tmp/swallowed-by-$cwid-desk"
-        }
+                csize=$(cat /tmp/swallowed-by-"$cwid"-size)
+                [ -n "$csize" ] && \
+                        xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
+                rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
+                        "/tmp/swallowed-by-$cwid-desk"
+        fi
 
         xprop -id "$cwid" >/dev/null 2>&1 && xdotool windowactivate "$cwid"
 
