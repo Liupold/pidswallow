@@ -43,6 +43,7 @@ vomit() {
 
         [ -f "/tmp/swallowed-by-$cwid-desk" ] \
                 && desk=$(cat /tmp/swallowed-by-"$cwid"-desk) && \
+                [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
                 xdotool set_desktop_for_window "$pwid" "$desk"
         [ -f "/tmp/swallowed-by-$cwid-pos" ] \
                 && cpos=$(cat /tmp/swallowed-by-"$cwid"-pos) && \
