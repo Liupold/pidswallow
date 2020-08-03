@@ -52,7 +52,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ```
 ## Dependencies
 1) xdotool (Needed for pid -> window-id conversion).
-2) xprop (Needed for window-id -> pid conversion).
+2) xprop (Needed for window-id -> pid conversion and for --loop).
 3) windows needed to have `_NET_WM_PID`.
 
 ## Installation
