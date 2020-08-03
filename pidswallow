@@ -105,8 +105,8 @@ swallow() {
         # subscribe to window
         {
                 xev -id "$cwid" -1 -geometry 0x0 -event structure | \
-                        sed -u -E -e 's/.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/' \
-                        -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/' | \
+                        sed -u -E -n -e 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/' \
+                        -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' | \
                         while read -r x y width height; do
                                 cpos="$x $y"
                                 csize="$width $height"
