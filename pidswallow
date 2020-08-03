@@ -114,19 +114,19 @@ swallow() {
 
                                 [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
                                 [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
-                                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-cdesk"
+                                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-desk"
                         done
         } 2>/dev/null &
 }
 
 toggle() {
         cwid=$(printf "%d\n" "$1") # decimal conversion
-        [ "$glue" -eq 1 ] && 'toggle is not supported/needed with --glue' && exit 1
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
                 vomit "$cwid"
                 return "$?"
         else
-                swallow "$cwid"
+                glue_="$glue" && \
+                        glue=0 && swallow "$cwid" && glue="$glue_" # overwrite here.
                 return "$?"
         fi
 }
