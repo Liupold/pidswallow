@@ -1,0 +1,68 @@
+.TH PIDSWALLOW 1 pidswallow\-2.0.d
+.SH NAME
+pidswallow \- swallow usning pid(s).
+.SH SYNOPSIS
+.B pidswallow
+.RB [ \-Vg ]
+.RB [ \-s | \-v | \-t
+.IR <WINDOW_ID> ]
+.RB [ \-s | \-v | \-t
+.IR <WINDOW_ID> ] ...
+
+.B pidswallow
+.RB [ \-Vg ]
+.IR WINDOW_ID
+
+.B pidswallow
+.RB [ \-Vg ]
+.RB [ \-l ]
+
+.SH DESCRIPTION
+.B pidswallow
+A super easy to config script written to auto hide the terminal window.
+(so that you don't have to). Window Manager agnostic.
+.SH OPTIONS
+.TP
+.B \-s
+.BI \-\-swallow " <WINDOW_ID>"
+
+Hides parent window of the given child window id.
+.TP
+.B \-v
+.BI \-\-vommit " <WINDOW_ID>"
+
+Unhides parent window of the given child window id.
+.TP
+.B \-t
+.BI \-\-toggle " <WINDOW_ID>"
+
+Toggle between swallow and vomit. (default if no flag is specified)
+.TP
+.B \-g
+.BI \-\-glue
+
+Treat if parent and child window are same. (recommended)
+.TP
+.B \-l
+.BI \-\-loop
+
+Listen and hide / unhide window on launch / remove. (Blocking)
+.TP
+.B \-V
+.BI \-\-verbose
+
+Shows useful information.
+.SH EXAMPLES
+.IP "pidswallow -Vs <WINDOW_ID>"
+Swallow the parent window and print details.
+.IP "xdotool getwindowfocus | pidswallow -t"
+Toggle the window (use WINDOW_ID of the focused window).
+.IP "pidswallow -Vgl"
+Listens window events and automatically swallow/vomit windows, print details and treat if they are glued together.
+.SH BUGS
+Report here: https://github.com/Liupold/pidswallow/issues
+.SH AUTHORS
+.IP \[bu]
+Rohn Chatterjee <rohnch@protonmail.ch>
+.IP \[bu]
+SeerLite <https://github.com/SeerLite>
