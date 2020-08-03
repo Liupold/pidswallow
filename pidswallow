@@ -95,12 +95,6 @@ swallow() {
         [ "$glue" -eq  0 ] || [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
         echo "$preglue_hook" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
-        ppos=$(xdotool getwindowgeometry "$pwid" | \
-                grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
-        psize=$(xdotool getwindowgeometry "$pwid" | \
-                grep -o '[0-9]\+x[0-9]\+' | tr 'x' ' ')
-        xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }"
-        xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }"
 
         # subscribe to window
         {
@@ -117,6 +111,13 @@ swallow() {
                 [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-desk"
                 done
         } 2>/dev/null &
+
+        ppos=$(xdotool getwindowgeometry "$pwid" | \
+                grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
+        psize=$(xdotool getwindowgeometry "$pwid" | \
+                grep -o '[0-9]\+x[0-9]\+' | tr 'x' ' ')
+        xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }"
+        xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }"
 }
 
 toggle() {
