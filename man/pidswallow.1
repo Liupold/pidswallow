@@ -1,6 +1,6 @@
 .TH PIDSWALLOW 1 pidswallow\-2.0.d
 .SH NAME
-pidswallow \- swallow usning pid(s).
+pidswallow \- swallow using pid(s).
 .SH SYNOPSIS
 .B pidswallow
 .RB [ \-Vg ]
@@ -29,7 +29,7 @@ A super easy to config script written to auto hide the terminal window.
 Hides parent window of the given child window id.
 .TP
 .B \-v
-.BI \-\-vommit " <WINDOW_ID>"
+.BI \-\-vomit " <WINDOW_ID>"
 
 Unhides parent window of the given child window id.
 .TP
@@ -46,7 +46,7 @@ Treat if parent and child window are same. (recommended)
 .B \-l
 .BI \-\-loop
 
-Listen and hide / unhide window on launch / remove. (Blocking)
+Listen and hide / unhide windows on launch / remove. (Blocking)
 .TP
 .B \-V
 .BI \-\-verbose
@@ -58,7 +58,7 @@ Swallow the parent window and print details.
 .IP "xdotool getwindowfocus | pidswallow -t"
 Toggle the window (use WINDOW_ID of the focused window).
 .IP "pidswallow -Vgl"
-Listens window events and automatically swallow/vomit windows, print details and treat if they are glued together.
+Listens window events and automatically swallow/vomit windows, print details and treat as if they are glued together.
 .SH BUGS
 Report here: https://github.com/Liupold/pidswallow/issues
 .SH AUTHORS
