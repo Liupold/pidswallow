@@ -38,10 +38,10 @@ vomit() {
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ]; then
-                desk=$(cat /tmp/swallowed-by-"$cwid"-desk 2>/dev/null)
-                [ -n "$desk" ] && \
-                        [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
-                        xdotool set_desktop_for_window "$pwid" "$desk"
+                cdesk=$(cat /tmp/swallowed-by-"$cwid"-desk 2>/dev/null)
+                [ -n "$cdesk" ] && \
+                        [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$cdesk" ] && \
+                        xdotool set_desktop_for_window "$pwid" "$cdesk"
 
                 cpos=$(cat /tmp/swallowed-by-"$cwid"-pos 2>/dev/null)
                 [ -n "$cpos" ] && \
@@ -108,11 +108,11 @@ swallow() {
                         grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
                 csize=$(echo "$cgeo" | \
                         grep -o '[0-9]\+x[0-9]\+' | tr 'x' ' ')
-                desk="$(xdotool get_desktop_for_window "$cwid")"
+                cdesk="$(xdotool get_desktop_for_window "$cwid")"
 
                 [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
                 [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
-                [ -n "$desk" ] && echo "$desk" > "/tmp/swallowed-by-$cwid-desk"
+                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-cdesk"
         done } 2>/dev/null &
 }
 
