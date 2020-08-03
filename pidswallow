@@ -99,9 +99,10 @@ swallow() {
                 grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
         psize=$(xdotool getwindowgeometry "$pwid" | \
                 grep -o '[0-9]\+x[0-9]\+' | tr 'x' ' ')
-        xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }"
-        xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }"
-
+        xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }" && \
+                echo "$psize" > "/tmp/swallowed-by-$cwid-size"
+        xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }" && \
+                echo "$ppos" > "/tmp/swallowed-by-$cwid-pos"
         # subscribe to window
         {
         xev -id "$cwid" -1 -event structure | \
