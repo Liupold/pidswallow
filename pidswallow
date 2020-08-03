@@ -112,7 +112,7 @@ swallow() {
 
                 [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
                 [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
-                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-cdesk"
+                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-desk"
         done } 2>/dev/null &
 }
 
