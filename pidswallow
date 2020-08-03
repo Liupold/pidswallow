@@ -104,18 +104,18 @@ swallow() {
 
         # subscribe to window
         {
-                xev -id "$cwid" -1 -geometry 0x0 -event structure | \
-                        sed -u -E -n -e 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/' \
-                        -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' | \
-                        while read -r x y width height; do
-                                cpos="$x $y"
-                                csize="$width $height"
-                                cdesk="$(xdotool get_desktop_for_window "$cwid")"
+        xev -id "$cwid" -1 -event structure | \
+         sed -u -E -n -e 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/' \
+         -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' | \
+         while read -r x y width height; do
+                cpos="$x $y"
+                csize="$width $height"
+                cdesk="$(xdotool get_desktop_for_window "$cwid")"
 
-                                [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
-                                [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
-                                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-desk"
-                        done
+                [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
+                [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
+                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-desk"
+                done
         } 2>/dev/null &
 }
 
