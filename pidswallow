@@ -28,8 +28,8 @@ glue=0
 vomit() {
         unset cwid pwid # similar to local
         cwid=$(printf "%d\n" "$1") # decimal conversion
-        [ -f "/tmp/swallowed-by-$cwid" ] || return 1
-        pwid=$(cat "/tmp/swallowed-by-$cwid")
+        pwid=$(cat "/tmp/swallowed-by-$cwid" 2>/dev/null)
+        [ -n "$pwid" ] || return 1
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomiting $pwid using $vomit_command"
         echo "$vomit_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
@@ -37,24 +37,22 @@ vomit() {
 
         [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-        [ "$glue" -eq  1 ] && \
-                [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ] && \
-        {
+        if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ]; then
+                desk=$(cat /tmp/swallowed-by-"$cwid"-desk 2>/dev/null)
+                [ -n "$desk" ] && \
+                        [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
+                        xdotool set_desktop_for_window "$pwid" "$desk"
 
-        [ -f "/tmp/swallowed-by-$cwid-desk" ] \
-                && desk=$(cat /tmp/swallowed-by-"$cwid"-desk) && \
-                [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$desk" ] && \
-                xdotool set_desktop_for_window "$pwid" "$desk"
-        [ -f "/tmp/swallowed-by-$cwid-pos" ] \
-                && cpos=$(cat /tmp/swallowed-by-"$cwid"-pos) && \
-                xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
-        [ -f "/tmp/swallowed-by-$cwid-size" ] \
-                && csize=$(cat /tmp/swallowed-by-"$cwid"-size) && \
-                xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
+                cpos=$(cat /tmp/swallowed-by-"$cwid"-pos 2>/dev/null)
+                [ -n "$cpos" ] && \
+                        xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
 
-        rm "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
+                csize=$(cat /tmp/swallowed-by-"$cwid"-size 2>/dev/null)
+                [ -n "$csize" ] && \
+                        xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
+        fi
+        rm -f "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
                 "/tmp/swallowed-by-$cwid-desk"
-        }
 
         xdotool windowactivate "$cwid" 2>/dev/null # if child still exists, re-focus it
 
