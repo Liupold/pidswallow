@@ -44,7 +44,7 @@ vomit() {
         rm "/tmp/swallowed-by-$cwid"
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ];
         then
-                [ -f "/tmp/swallowed-by-$cwid-event" ] && \
+                [ -f "/tmp/swallowed-by-$cwid-structure" ] && \
                 sed -unEe 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
                 -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
                 "/tmp/swallowed-by-$cwid-event" |
@@ -52,6 +52,13 @@ vomit() {
                 read -r x y w h
                 xdo move -x "$x" -y "$y" "$pwid"
                 xdo resize -w "$w" -h "$h" "$pwid"
+                }
+
+                [ -f "/tmp/swallowed-by-$cwid-desk" ] && \
+                grep -o '[0-9]\+' "/tmp/swallowed-by-$cwid-desk" |
+                {
+                        read -r desk
+                        xdotool set_desktop_for_window "$pwid" "$desk"
                 }
         fi
         rm -f "/tmp/swallowed-by-$cwid-event"
@@ -112,9 +119,12 @@ swallow() {
                 > "/tmp/swallowed-by-$cwid-event"
         # subscribe to window
         {
-        xev -id "$cwid" -1 -event structure | while read -r event ; do
+        xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
                 [ "${event#*ConfigureNotify}" != "$event" ] \
-                        && echo "$event" > "/tmp/swallowed-by-$cwid-event"
+                        && echo "$event" > "/tmp/swallowed-by-$cwid-structure"
+                [ "${event#*_NET_WM_DESKTOP}" != "$event" ] \
+                        && xprop -notype -id "$cwid" _NET_WM_DESKTOP  \
+                        > "/tmp/swallowed-by-$cwid-desk"
                 done
         } 2>/dev/null &
 }
