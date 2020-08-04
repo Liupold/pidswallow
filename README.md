@@ -1,7 +1,7 @@
 # A stupid simple swallower 😉.
 ### (Based on Process hierarchy)
 
-Super easy to config. Uses `xdoool` WM/DE independent.
+Super easy to config. Uses `xdo` WM/DE independent.
 
 [![PKGBUILD-STATUS](https://github.com/Liupold/pidswallow/workflows/PKBUILD/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22PKBUILD%22)
 [![SHELLCHECK-STATUS](https://github.com/Liupold/pidswallow/workflows/shellcheck/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22shellcheck%22)
