@@ -18,43 +18,44 @@ bugs/issues: https://github.com/liupold/pidswallow.
 swallowable=" ${PIDSWALLOW_SWALLOWABLE:-"$TERMINAL xterm konsole xfce4-terminal"} "
 blacklist=" ${PIDSWALLOW_BLACKLIST:-"$swallowable"} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
-swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdotool windowunmap --sync {%pwid\}}"
-vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdotool windowmap --sync {%pwid\}}"
+swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
+vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show {%pwid\}}"
 preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
 verbose=0
 glue=0
+
+
+vecho() {
+        [ "$verbose" -eq 1 ] && echo "$@"
+}
 
 vomit() {
         unset cwid pwid # similar to local
         cwid=$(printf "%d\n" "$1") # decimal conversion
         pwid=$(cat "/tmp/swallowed-by-$cwid" 2>/dev/null)
         [ -n "$pwid" ] || return 1
-        [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomiting $pwid using $vomit_command"
+        vecho "vomit - $cwid vomiting $pwid using $vomit_command"
         echo "$vomit_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
 
 
-        [ "$verbose" -eq 1 ] && echo "vomit - $cwid vomited $pwid"
+        vecho "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
-        if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ]; then
-                cdesk=$(cat /tmp/swallowed-by-"$cwid"-desk 2>/dev/null)
-                [ -n "$cdesk" ] && \
-                        [ "$(xdotool get_desktop_for_window "$pwid")" -ne "$cdesk" ] && \
-                        xdotool set_desktop_for_window "$pwid" "$cdesk"
-
-                cpos=$(cat /tmp/swallowed-by-"$cwid"-pos 2>/dev/null)
-                [ -n "$cpos" ] && \
-                        xdotool windowmove "$pwid" "${cpos%% *}" "${cpos##* }"
-
-                csize=$(cat /tmp/swallowed-by-"$cwid"-size 2>/dev/null)
-                [ -n "$csize" ] && \
-                        xdotool windowsize "$pwid" "${csize%% *}" "${csize##* }"
+        if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ];
+        then
+                [ -f "/tmp/swallowed-by-$cwid-event" ] && \
+                sed -unEe 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
+                -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
+                "/tmp/swallowed-by-$cwid-event" |
+                {
+                read -r x y w h
+                xdo move -x "$x" -y "$y" "$pwid"
+                xdo resize -w "$w" -h "$h" "$pwid"
+                }
         fi
-        rm -f "/tmp/swallowed-by-$cwid-pos" "/tmp/swallowed-by-$cwid-size" \
-                "/tmp/swallowed-by-$cwid-desk"
-
-        xdotool windowactivate "$cwid" 2>/dev/null # if child still exists, re-focus it
+        rm -f "/tmp/swallowed-by-$cwid-event"
+        xdo activate "$cwid" 2>/dev/null # if child still exists, re-focus it
 
 }
 
@@ -68,14 +69,14 @@ swallow() {
         unset cwid pwid cname pname ppid cpid # similar to local.
         cwid=$(printf "%d\n" "$1") # decimal conversion
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
-        cpid="$(xdotool getwindowpid "$cwid" 2>/dev/null)" || return 3
+        cpid="$(xdo pid "$cwid")" || return 3
         cname="$(ps -p "$cpid" -o comm=)"
         [ "${blacklist#* $cname }" != "$blacklist" ] && return 0
         process_tree="$(pstree -ATlsp "$cpid" \
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
-                -e 's|---|\n|g' -e 's|-+-|\n|g' -e 's/\n'"$cname"':'"$cpid"'.*//' -e '1p' | tac)"
-        [ "$verbose" -eq 1 ] && \
-        echo "swallow - Scanning process tree of $cname($cpid): $process_tree" | \
+                -e 's|---|\n|g' -e 's|-+-|\n|g' \
+                -e 's/\n'"$cname"':'"$cpid"'.*//' -e '1p' | tac)"
+        vecho "swallow - Scanning process tree of $cname($cpid): $process_tree" | \
         paste -s -d ' ' # put it all together in a single verbose line
         for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
@@ -83,39 +84,37 @@ swallow() {
                         && ppid="${parent##*:}" && break
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
-        [ "$verbose" -eq 1 ] && echo "swallow - $pname($ppid) detected as swallowable"
-        pwid="$(xdotool search --limit 1 --onlyvisible --pid "$ppid")"
+        vecho "swallow - $pname($ppid) detected as swallowable"
+        pwid="$(xdo id -p "$ppid")"
         [ -z "$pwid" ] && return 4
-        [ "$verbose" -eq 1 ] && echo "swallow - $cwid swallowing $pwid using $swallow_command"
+        vecho "swallow - $cwid swallowing $pwid using $swallow_command"
         echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
                 return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
-        [ "$verbose" -eq 1 ] && echo "swallow - $cname($cwid) swallowed $pname($pwid)"
-        [ "$glue" -eq  0 ] || [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
+        vecho "swallow - $cname($cwid) swallowed $pname($pwid)"
+
+        [ "$glue" -eq  0 ] ||\
+                [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
+
         echo "$preglue_hook" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
-        ppos=$(xdotool getwindowgeometry "$pwid" | \
-                grep -o '[0-9]\+,[0-9]\+' | tr ',' ' ')
-        psize=$(xdotool getwindowgeometry "$pwid" | \
-                grep -o '[0-9]\+x[0-9]\+' | tr 'x' ' ')
-        xdotool windowsize "$cwid" "${psize%% *}" "${psize##* }" && \
-                echo "$psize" > "/tmp/swallowed-by-$cwid-size"
-        xdotool windowmove "$cwid" "${ppos%% *}" "${ppos##* }" && \
-                echo "$ppos" > "/tmp/swallowed-by-$cwid-pos"
+
+        pgeo=$(xwininfo -shape -id "$pwid")
+        x=$(echo "$pgeo" | grep -m1 "X" ); x="${x##* }"
+        y=$(echo "$pgeo" | grep -m1 "Y" ); y="${y##* }"
+        w=$(echo "$pgeo" | grep -m1 "Width" ); w="${w##* }"
+        h=$(echo "$pgeo" | grep -m1 "Height" ); h="${h##* }"
+
+        xdo move -x "$x" -y "$y" "$cwid"
+        xdo resize -w "$w" -h "$h" "$cwid"
+        echo "ConfigureNotify ($x,$y), width $w, height $h" \
+                > "/tmp/swallowed-by-$cwid-event"
         # subscribe to window
         {
-        xev -id "$cwid" -1 -event structure | \
-         sed -u -E -n -e 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/' \
-         -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' | \
-         while read -r x y width height; do
-                cpos="$x $y"
-                csize="$width $height"
-                cdesk="$(xdotool get_desktop_for_window "$cwid")"
-
-                [ -n "$csize" ] && echo "$cpos" > "/tmp/swallowed-by-$cwid-pos"
-                [ -n "$cpos" ] && echo "$csize" > "/tmp/swallowed-by-$cwid-size"
-                [ -n "$cdesk" ] && echo "$cdesk" > "/tmp/swallowed-by-$cwid-desk"
+        xev -id "$cwid" -1 -event structure | while read -r event ; do
+                [ "${event#*ConfigureNotify}" != "$event" ] \
+                        && echo "$event" > "/tmp/swallowed-by-$cwid-event"
                 done
         } 2>/dev/null &
 }
@@ -145,7 +144,6 @@ loop() {
                                 && node_removed="$wid" && break
                 done
                 prev_event="$event"
-                # [ -z "${node_added}${node_removed}" ] && continue
                 [ -n "$node_added" ] && swallow "$node_added"
                 [ -n "$node_removed" ] && vomit "$node_removed"
         done
@@ -164,7 +162,7 @@ while true; do
         case "$1" in
                 '-V'|'--verbose')
                         verbose=1
-                        [ "$verbose" -eq 1 ] && echo "SWALLOWABLE: \"$swallowable\""
+                        vecho "SWALLOWABLE: \"$swallowable\""
                         shift; continue;;
                 '-g'|'--glue')
                         glue=1
