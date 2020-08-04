@@ -49,9 +49,9 @@ vomit() {
                 -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
                 "/tmp/swallowed-by-$cwid-event" |
                 {
-                read -r x y w h
-                xdo move -x "$x" -y "$y" "$pwid"
-                xdo resize -w "$w" -h "$h" "$pwid"
+                        read -r x y w h
+                        xdo move -x "$x" -y "$y" "$pwid"
+                        xdo resize -w "$w" -h "$h" "$pwid"
                 }
 
                 [ -f "/tmp/swallowed-by-$cwid-desk" ] && \
@@ -61,7 +61,7 @@ vomit() {
                         xdotool set_desktop_for_window "$pwid" "$desk"
                 }
         fi
-        rm -f "/tmp/swallowed-by-$cwid-event"
+        rm -f "/tmp/swallowed-by-$cwid-event" "/tmp/swallowed-by-$cwid-desk"
         xdo activate "$cwid" 2>/dev/null # if child still exists, re-focus it
 
 }
