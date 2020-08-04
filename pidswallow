@@ -47,7 +47,7 @@ vomit() {
                 [ -f "/tmp/swallowed-by-$cwid-structure" ] && \
                 sed -unEe 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
                 -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
-                "/tmp/swallowed-by-$cwid-event" |
+                "/tmp/swallowed-by-$cwid-structure" |
                 {
                         read -r x y w h
                         xdo move -x "$x" -y "$y" "$pwid"
@@ -61,7 +61,7 @@ vomit() {
                         xdotool set_desktop_for_window "$pwid" "$desk"
                 }
         fi
-        rm -f "/tmp/swallowed-by-$cwid-event" "/tmp/swallowed-by-$cwid-desk"
+        rm -f "/tmp/swallowed-by-$cwid-structure" "/tmp/swallowed-by-$cwid-desk"
         xdo activate "$cwid" 2>/dev/null # if child still exists, re-focus it
 
 }
@@ -116,10 +116,11 @@ swallow() {
         xdo move -x "$x" -y "$y" "$cwid"
         xdo resize -w "$w" -h "$h" "$cwid"
         echo "ConfigureNotify ($x,$y), width $w, height $h" \
-                > "/tmp/swallowed-by-$cwid-event"
+                > "/tmp/swallowed-by-$cwid-structure"
         # subscribe to window
         {
         xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
+                [ "${event#*DestroyNotify}" != "$event" ] && pkill -f "xev.*$cwid"
                 [ "${event#*ConfigureNotify}" != "$event" ] \
                         && echo "$event" > "/tmp/swallowed-by-$cwid-structure"
                 [ "${event#*_NET_WM_DESKTOP}" != "$event" ] \
