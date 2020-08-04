@@ -31,7 +31,7 @@ vecho() {
 }
 
 vomit() {
-        unset cwid pwid # similar to local
+        unset cwid pwid x y w h # similar to local
         cwid=$(printf "%d\n" "$1") # decimal conversion
         pwid=$(cat "/tmp/swallowed-by-$cwid" 2>/dev/null)
         [ -n "$pwid" ] || return 1
@@ -66,7 +66,7 @@ swallow() {
         # 3 -> window lacks a _NET_WM_PID property.
         # 4 -> window already swallowed
         # 5 -> swallow_command failed
-        unset cwid pwid cname pname ppid cpid # similar to local.
+        unset cwid pwid cname pname ppid cpid x y w h # similar to local.
         cwid=$(printf "%d\n" "$1") # decimal conversion
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
         cpid="$(xdo pid "$cwid")" || return 3
@@ -88,7 +88,7 @@ swallow() {
         pwid="$(xdo id -p "$ppid")"
         [ -z "$pwid" ] && return 4
         vecho "swallow - $cwid swallowing $pwid using $swallow_command"
-        echo "$swallow_command" | \
+        xdo activate "$pwid"; echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
                 return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
