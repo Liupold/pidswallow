@@ -92,7 +92,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         vecho "swallow - $pname($ppid) detected as swallowable"
-        pwid="$(xdo id -p "$ppid")"
+        pwid="$(xdo id -p "$ppid" | sed 1q)"
         [ -z "$pwid" ] && return 4
         vecho "swallow - $cwid swallowing $pwid using $swallow_command"
         xdo activate "$pwid"; echo "$swallow_command" | \
