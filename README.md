@@ -51,9 +51,11 @@ pidswallow 29360131  0.03s user 0.01s system 83% cpu 0.048 total (vomit)
 takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ```
 ## Dependencies
-1) xdotool (Needed for pid -> window-id conversion).
+1) xdo (Needed for pid -> window-id conversion).
 2) xprop (Needed for window-id -> pid conversion and for --loop).
-3) windows needed to have `_NET_WM_PID`.
+3) xev (Needed for --glue).
+4) windows needed to have `_NET_WM_PID`.
+5) xdotool (optional) (Workspace Management).
 
 ## Installation
 
@@ -89,8 +91,8 @@ The following ones accept lists of space separated process names.
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
 The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
-* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdotool windowunmap --sync {%pwid}`
-* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdotool windowmap --sync {%pwid}`
+* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide {%pwid}`
+* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show {%pwid}`
 * `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
 
 ## Tested on
@@ -122,13 +124,13 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 1) Add `pidswallow` to your path.
 2) run this and click on the child window (not the term) to swallow.
 ```
- xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | pidswallow -t
+ xwininfo | awk '/Window id:/{print $4}' | pidswallow -gt
 ```
 3) or pass the window-id via keyboard shortcut. (Eg: sxhkd toggle).
 
 ```
 super + v
-    xdotool getwindowfocus | pidswallow -t
+    xdo id | pidswallow -gt
 ```
 
 ### Launch a program from term wihout being swallowed.
