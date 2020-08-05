@@ -34,10 +34,10 @@ bugs/issues: https://github.com/liupold/pidswallow.
 
 ```
 $ time pidswallow -t 29360131
-pidswallow 29360131  0.04s user 0.03s system 115% cpu 0.060 total (swallow)
+pidswallow -t 0x3400003  0.04s user 0.04s system 125% cpu 0.065 total (swallow)
 
 $ time pidswallow -t 29360131
-pidswallow 29360131  0.03s user 0.01s system 83% cpu 0.048 total (vomit)
+pidswallow -t 0x3400003  0.02s user 0.01s system 107% cpu 0.030 total (vomit)
 ```
 
 ## Demo
@@ -138,7 +138,7 @@ super + v
 setsid -f <command>  # this will not swallow the terminal.
 ```
 
-## WM specific recommendations (Experimental)
+## WM specific recommendations.
 ### bspwm
 Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
