@@ -25,9 +25,8 @@ preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 verbose=0
 glue=0
 
-
 vecho() {
-        [ "$verbose" -eq 1 ] && echo "$@"
+        [ "$verbose" -eq 1 ] && echo "$@" | paste -s -d ' '
 }
 
 vomit() {
@@ -83,8 +82,7 @@ swallow() {
                 | sed -n -e 's|(|:|g' -e 's|)||g' \
                 -e 's|---|\n|g' -e 's|-+-|\n|g' \
                 -e 's/\n'"$cname"':'"$cpid"'.*//' -e '1p' | tac)"
-        vecho "swallow - Scanning process tree of $cname($cpid): $process_tree" | \
-        paste -s -d ' ' # put it all together in a single verbose line
+        vecho "swallow - Scanning process tree of $cname($cpid): $process_tree"
         for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
                 [ "${swallowable#* $pname }" != "$swallowable" ] \
@@ -120,14 +118,14 @@ swallow() {
         # subscribe to window
         {
         xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
-                [ "${event#*DestroyNotify}" != "$event" ] && pkill -f "xev.*$cwid"
+                [ "${event#*DestroyNotify}" != "$event" ] && pkill -s 0 -f "xev.*$cwid"
                 [ "${event#*ConfigureNotify}" != "$event" ] \
                         && echo "$event" > "/tmp/swallowed-by-$cwid-structure"
                 [ "${event#*_NET_WM_DESKTOP}" != "$event" ] \
                         && xprop -notype -id "$cwid" _NET_WM_DESKTOP  \
                         > "/tmp/swallowed-by-$cwid-desk"
                 done
-        } 2>/dev/null &
+        } &
 }
 
 toggle() {
