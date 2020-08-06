@@ -93,7 +93,7 @@ swallow() {
         pwid="$(xdo id -p "$ppid" | sed 1q)"
         [ -z "$pwid" ] && return 4
         vecho "swallow - $cwid swallowing $pwid using $swallow_command"
-        xdo activate "$pwid"; echo "$swallow_command" | \
+        echo "$swallow_command" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
                 return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
