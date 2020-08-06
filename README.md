@@ -33,10 +33,10 @@ bugs/issues: https://github.com/liupold/pidswallow.
 * Super fast. (Really!) (0.04s) (worst case).
 
 ```
-$ time pidswallow -t 29360131
+$ time pidswallow -t 0x3400003
 pidswallow -t 0x3400003  0.04s user 0.04s system 125% cpu 0.065 total (swallow)
 
-$ time pidswallow -t 29360131
+$ time pidswallow -t 0x3400003
 pidswallow -t 0x3400003  0.02s user 0.01s system 107% cpu 0.030 total (vomit)
 ```
 
@@ -73,6 +73,11 @@ yay -S pidswallow-dev-git
  Add `pidswallow` to your path.
 
 ### Autostart
+1) add the following to your `bashrc`, `zshrc` or shell inti script.
+
+```
+[ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
+```
 
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
@@ -85,7 +90,7 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 Environment variables can be exported to change the behavior of pidswallow.
 
 The following ones accept lists of space separated process names.
-* `PIDSWALLOW_SWALLOWABLE`: can be swallowed by pidswallow (e.g. your terminal). Default: "alacritty urxvt konsole xfce4-terminal"
+* `PIDSWALLOW_SWALLOWABLE`: can be swallowed by pidswallow (shells). Default: \<your-login-shell>
 * `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed. Default: copy from `$PIDSWALLOW_SWALLOWABLE`
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
@@ -108,14 +113,6 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 ## Knows Issues
 * <b>sxiv</b> doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
-* By default, every <b>Xfce Terminal</b> is connected to the same D-Bus daemon. This makes it hard for pidswallow to see which terminal should be swallowed, since they all share the same PID.
-
-   -> As a workaround, you can edit the Xfce Terminal launcher to use the `--disable-server` flag:
-    - Open Application Finder
-    - Search for "Xfce Terminal"
-    - Right click the result that has "Terminal Emulator" as its description and click Edit
-    - Change the "Command" field to `xfce4-terminal --disable-server`
-    - Save
 
 ## Tricks
 ### Manual swallow (toggle)

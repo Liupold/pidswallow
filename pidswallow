@@ -15,7 +15,7 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 "
-swallowable=" ${PIDSWALLOW_SWALLOWABLE:-"$TERMINAL xterm konsole xfce4-terminal"} "
+swallowable=" ${PIDSWALLOW_SWALLOWABLE:-" ${SHELL##*/} "} "
 blacklist=" ${PIDSWALLOW_BLACKLIST:-"$swallowable"} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
@@ -76,7 +76,7 @@ swallow() {
         # 0 -> Found and swallowed
         # 1 -> No swallowable window found.
         # 3 -> window lacks a _NET_WM_PID property.
-        # 4 -> window already swallowed
+        # 4 -> window already swallowed / not possible
         # 5 -> swallow_command failed
         unset cwid pwid cname pname ppid cpid x y w h # similar to local.
         cwid=$(printf "%d\n" "$1") # decimal conversion
@@ -96,7 +96,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         vecho "swallow - $pname($ppid) detected as swallowable"
-        pwid="$(xdo id -p "$ppid" | sed 1q)"
+        [ -f "/tmp/term-wid-$ppid" ] && pwid="$(cat /tmp/term-wid-"$ppid")"
         [ -z "$pwid" ] && return 4
         [ "$glue" -eq 1 ] && echo "$preglue_hook" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
