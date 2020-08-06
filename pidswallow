@@ -212,7 +212,7 @@ while true; do
                         glue=1
                         shift; continue;;
                 '-f'|'--focusd')
-                        focusd &
+                        focus_daemon &
                         shift; continue;;
                 '--')
                         shift; break;;
