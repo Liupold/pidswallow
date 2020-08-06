@@ -11,6 +11,7 @@ OPTIONS:
         -t  --toggle <CWID>     toggle between swallow and vomit. (default)
         -g  --glue              treat if parent and child window are same. (recommended)
         -l  --loop              listen and hide / unhide window on launch / remove.
+        -f  --focusd            watch for focus events for management. (recommended)
         -V  --verbose           Shows useful information.
 
 bugs/issues: https://github.com/liupold/pidswallow.
@@ -25,9 +26,21 @@ preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
 verbose=0
 glue=0
+focusd=0
+focusd_path="/tmp/pidswallow.focusd"
 
 vecho() {
         [ "$verbose" -eq 1 ] && echo "$@" | paste -s -d ' '
+}
+
+focus_daemon() {
+        event="$(xprop -notype -root _NET_ACTIVE_WINDOW)"
+        pre_fwid="${event##* }"
+        xprop -notype -spy -root _NET_ACTIVE_WINDOW | while read -r event; do
+                pre_fwid="$fwid"
+                fwid="${event##* }"
+                echo "$pre_fwid,$fwid" > "$focusd_path"
+        done
 }
 
 vomit() {
@@ -133,10 +146,12 @@ swallow() {
         echo "ConfigureNotify ($x,$y), width $w, height $h" \
                 > "/tmp/swallowed-by-$cwid-structure"
         xprop -notype -id "$cwid" _NET_WM_DESKTOP > "/tmp/swallowed-by-$cwid-desk"
+
         # subscribe to window
         {
         xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
-                [ "${event#*DestroyNotify}" != "$event" ] && pkill -s 0 -f "xev.*$cwid"
+                [ "${event#*DestroyNotify}" != "$event" ] && xprop -id "$cwid" \
+                        && pkill -s 0 -f "xev.*$cwid"
                 [ "${event#*ConfigureNotify}" != "$event" ] \
                         && echo "$event" > "/tmp/swallowed-by-$cwid-structure"
                 [ "${event#*_NET_WM_DESKTOP}" != "$event" ] \
@@ -159,6 +174,7 @@ toggle() {
 }
 
 loop() {
+        # [ "$focusd" -eq 1 ] && focus_daemon &
         prev_event="$(xprop -root  _NET_CLIENT_LIST)"
         xprop -spy -root  _NET_CLIENT_LIST | while read -r event; do
                 unset node_added node_removed
@@ -180,7 +196,7 @@ loop() {
 [ -p /dev/stdin ] && eval set -- "$* $(cat /dev/stdin)" # basic pipe support
 [ "$#" -eq 0 ] && echo "$usage" && exit 1
 
-TEMP=$(getopt -o 'Vghlt:s:v:' --long 'verbose,glue,help,loop,toggle:,swallow:,vomit:' \
+TEMP=$(getopt -o 'Vghlft:s:v:' --long 'verbose,glue,help,loop,focusd,toggle:,swallow:,vomit:' \
         -n 'pidswallow' -- "$@")
 
 # precheck
@@ -204,9 +220,7 @@ done
 eval set -- "${TEMP}"; unset TEMP
 while true; do
         case "$1" in
-                '-V'|'--verbose')
-                        shift; continue;;
-                '-g'|'--glue')
+                '-V'|'--verbose'|'-g'|'--glue')
                         shift; continue;;
                 '-h' | '--help' )
                         echo "$usage" && exit 0;;
