@@ -11,7 +11,7 @@ OPTIONS:
         -t  --toggle <CWID>     toggle between swallow and vomit. (default)
         -g  --glue              treat if parent and child window are same. (recommended)
         -l  --loop              listen and hide / unhide window on launch / remove.
-        -f  --focusd            watch for focus events for management. (recommended)
+        -f  --focusd            watch for focus events for management. (daemon fix)
         -V  --verbose           Shows useful information.
 
 bugs/issues: https://github.com/liupold/pidswallow.
@@ -175,7 +175,6 @@ toggle() {
 }
 
 loop() {
-        focus_daemon &
         prev_event="$(xprop -root  _NET_CLIENT_LIST)"
         xprop -spy -root  _NET_CLIENT_LIST | while read -r event; do
                 unset node_added node_removed
@@ -212,6 +211,9 @@ while true; do
                 '-g'|'--glue')
                         glue=1
                         shift; continue;;
+                '-f'|'--focusd')
+                        focusd &
+                        shift; continue;;
                 '--')
                         shift; break;;
                 *)
@@ -222,7 +224,7 @@ done
 eval set -- "${TEMP}"; unset TEMP
 while true; do
         case "$1" in
-                '-V'|'--verbose'|'-g'|'--glue')
+                '-V'|'--verbose'|'-g'|'--glue'|'-f'|'--focusd')
                         shift; continue;;
                 '-h' | '--help' )
                         echo "$usage" && exit 0;;
