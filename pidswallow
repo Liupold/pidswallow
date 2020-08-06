@@ -32,19 +32,19 @@ vecho() {
 }
 
 focus_daemon() {
-        # last focused
-        # ps  > /dev/null
         ps -p "$(cat /tmp/pidswallow.pid)" >/dev/null 2>&1 && return 0
         pre_fwid="$(xdo id)"
         echo "$$" > '/tmp/pidswallow.pid'
         xprop -notype -spy -root _NET_ACTIVE_WINDOW | while read -r _; do
-                pre_fwid="$fwid"; fwid="$(xdo id)"
+                pre_fwid="$fwid"; _fwid="$(xdo id)"
+                [ "$_fwid" = '0x0' ] || [ "$_fwid" = "$pre_fwid" ] && continue
+                fwid="$_fwid"
                 echo "$pre_fwid" > "/tmp/pidswallow.focusd"
         done
 }
 
 last_focus() {
-        ps -p "$(cat /tmp/pidswallow.pid)" >/dev/null 2>&1 || return 1
+        ps -p "$(cat /tmp/pidswallow.pid 2>/dev/null)" >/dev/null 2>&1 || return 1
         [ -f "/tmp/pidswallow.focusd" ] && cat "/tmp/pidswallow.focusd"
 }
 
@@ -119,7 +119,7 @@ swallow() {
         pwid="$(xdo id -p "$ppid" | sed 1q)"
 
         [ "${daemon_term#* $pname }" != "$daemon_term" ] && \
-                pwid="$(xdo id -p "$ppid" | grep -o "$(last_focus)")"
+                pwid="$(xdo id -p "$ppid" | grep -o "$(last_focus)")" || return 1
 
         [ -z "$pwid" ] && return 4
         [ "$glue" -eq 1 ] && echo "$preglue_hook" | \
