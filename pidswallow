@@ -41,6 +41,13 @@ vomit() {
 
         vecho "vomit - $cwid vomited $pwid"
         rm "/tmp/swallowed-by-$cwid"
+
+        if xwininfo -id "$cwid" >/dev/null 2>&1; then
+                xdo activate "$cwid" # if child still exists, re-focus it
+        else
+                xdo activate "$pwid"
+        fi
+
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ];
         then
                 [ -f "/tmp/swallowed-by-$cwid-structure" ] && \
@@ -61,7 +68,6 @@ vomit() {
                 }
         fi
         rm -f "/tmp/swallowed-by-$cwid-structure" "/tmp/swallowed-by-$cwid-desk"
-        xdo activate "$cwid" 2>/dev/null # if child still exists, re-focus it
 
 }
 
@@ -117,6 +123,7 @@ swallow() {
         xdo resize -w "$w" -h "$h" "$cwid"
         echo "ConfigureNotify ($x,$y), width $w, height $h" \
                 > "/tmp/swallowed-by-$cwid-structure"
+        xprop -notype -id "$cwid" _NET_WM_DESKTOP > "/tmp/swallowed-by-$cwid-desk"
         # subscribe to window
         {
         xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
