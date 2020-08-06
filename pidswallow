@@ -16,7 +16,7 @@ OPTIONS:
 bugs/issues: https://github.com/liupold/pidswallow.
 "
 swallowable=" ${PIDSWALLOW_SWALLOWABLE:-"$TERMINAL xterm konsole xfce4-terminal"} "
-daemon_term="xfce4-terminal gnome-terminal-"
+daemon_term=" xfce4-terminal gnome-terminal-"
 blacklist=" ${PIDSWALLOW_BLACKLIST:-"$swallowable"} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
@@ -99,8 +99,12 @@ swallow() {
         vecho "swallow - $pname($ppid) detected as swallowable"
 
         pwid="$(xdo id -p "$ppid" | sed 1q)"
+
         [ "${daemon_term#* $pname }" != "$daemon_term" ] && \
-                pwid="$(xdo -id -p "$ppid" | grep -o "$(xdo id)")"
+                pwid="$(xdo id -p "$ppid" | grep -o "$(xdo id)")"
+
+        xdo id -p "$ppid"
+        echo "id:"; xdo id
 
         [ -z "$pwid" ] && return 4
         [ "$glue" -eq 1 ] && echo "$preglue_hook" | \
