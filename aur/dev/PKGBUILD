@@ -9,9 +9,10 @@ pkgdesc="A script to swallow your terminal automatically"
 arch=(x86_64)
 url="https://github.com/Liupold/pidswallow/tree/dev"
 license=('APACHE')
-depends=(xdotool)
+depends=(xdo xorg-xprop xorg-xev xorg-xwininfo sh)
 makedepends=(git)
 checkdepends=(shellcheck)
+optdepends=('xdotool: Workspace/Desktop Management')
 provides=(pidswallow)
 conflicts=(pidswallow)
 

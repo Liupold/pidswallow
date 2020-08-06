@@ -1,7 +1,7 @@
 # A stupid simple swallower 😉.
 ### (Based on Process hierarchy)
 
-Super easy to config. Uses `xdoool` WM/DE independent.
+Super easy to config. Uses `xdo` WM/DE independent.
 
 [![PKGBUILD-STATUS](https://github.com/Liupold/pidswallow/workflows/PKBUILD/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22PKBUILD%22)
 [![SHELLCHECK-STATUS](https://github.com/Liupold/pidswallow/workflows/shellcheck/badge.svg)](https://github.com/Liupold/pidswallow/actions?query=workflow%3A%22shellcheck%22)
@@ -34,10 +34,10 @@ bugs/issues: https://github.com/liupold/pidswallow.
 
 ```
 $ time pidswallow -t 29360131
-pidswallow 29360131  0.04s user 0.03s system 115% cpu 0.060 total (swallow)
+pidswallow -t 0x3400003  0.04s user 0.04s system 125% cpu 0.065 total (swallow)
 
 $ time pidswallow -t 29360131
-pidswallow 29360131  0.03s user 0.01s system 83% cpu 0.048 total (vomit)
+pidswallow -t 0x3400003  0.02s user 0.01s system 107% cpu 0.030 total (vomit)
 ```
 
 ## Demo
@@ -51,9 +51,10 @@ pidswallow 29360131  0.03s user 0.01s system 83% cpu 0.048 total (vomit)
 takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ```
 ## Dependencies
-1) xdotool (Needed for pid -> window-id conversion).
-2) xprop (Needed for window-id -> pid conversion and for --loop).
-3) windows needed to have `_NET_WM_PID`.
+1) xdo
+2) xprop (`--loop` and `--glue`).
+3) xev (`--glue`).
+4) xdotool (cross-workspace `--glue`, optional).
 
 ## Installation
 
@@ -89,8 +90,8 @@ The following ones accept lists of space separated process names.
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
 The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
-* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdotool windowunmap --sync {%pwid}`
-* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdotool windowmap --sync {%pwid}`
+* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide {%pwid}`
+* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show {%pwid}`
 * `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
 
 ## Tested on
@@ -122,13 +123,13 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 1) Add `pidswallow` to your path.
 2) run this and click on the child window (not the term) to swallow.
 ```
- xwininfo | awk '/Window id:/{print $4}' | tr '[a-f]' '[A-F]' | pidswallow -t
+ xwininfo | awk '/Window id:/{print $4}' | pidswallow -gt
 ```
 3) or pass the window-id via keyboard shortcut. (Eg: sxhkd toggle).
 
 ```
 super + v
-    xdotool getwindowfocus | pidswallow -t
+    xdo id | pidswallow -gt
 ```
 
 ### Launch a program from term wihout being swallowed.
@@ -136,7 +137,7 @@ super + v
 setsid -f <command>  # this will not swallow the terminal.
 ```
 
-## WM specific recommendations (Experimental)
+## WM specific recommendations.
 ### bspwm
 Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
