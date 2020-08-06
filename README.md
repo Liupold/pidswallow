@@ -51,11 +51,10 @@ pidswallow -t 0x3400003  0.02s user 0.01s system 107% cpu 0.030 total (vomit)
 takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ```
 ## Dependencies
-1) xdo (Needed for pid -> window-id conversion).
-2) xprop (Needed for window-id -> pid conversion and for --loop).
-3) xev (Needed for --glue).
-4) windows needed to have `_NET_WM_PID`.
-5) xdotool (optional) (Workspace Management).
+1) xdo
+2) xprop (`--loop` and `--glue`).
+3) xev (`--glue`).
+4) xdotool (cross-workspace `--glue`, optional).
 
 ## Installation
 
