@@ -73,10 +73,11 @@ yay -S pidswallow-dev-git
  Add `pidswallow` to your path.
 
 ### Autostart
-1) add the following to your `bashrc`, `zshrc` or shell inti script.
+1) add the following to your `bashrc`, `zshrc` or shell init script.
 
 ```
 [ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
+trap "( rm -f /tmp/term-wid-"$$" )" EXIT INT HUP
 ```
 
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
