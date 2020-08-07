@@ -16,7 +16,7 @@ OPTIONS:
 bugs/issues: https://github.com/liupold/pidswallow.
 "
 swallowable=" ${PIDSWALLOW_SWALLOWABLE:-" ${SHELL##*/} "} "
-blacklist=" ${PIDSWALLOW_BLACKLIST:-" $TERMINAL urxvt konsole xfce4-terminal "} "
+blacklist=" ${PIDSWALLOW_BLACKLIST:-" $TERMINAL "} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show {%pwid\}}"
