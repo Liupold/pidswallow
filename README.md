@@ -77,7 +77,7 @@ yay -S pidswallow-dev-git
 
 ```
 [ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
-trap "( rm -f /tmp/term-wid-"$$" )" EXIT INT HUP
+trap "( rm -f /tmp/term-wid-"$$" )" EXIT HUP
 ```
 
 2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
