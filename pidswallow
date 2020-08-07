@@ -51,7 +51,7 @@ vomit() {
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ];
         then
                 [ -f "/tmp/swallowed-by-$cwid-structure" ] && \
-                sed -unEe 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
+                sed -unEe 's/.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
                 -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
                 "/tmp/swallowed-by-$cwid-structure" |
                 {
@@ -121,14 +121,14 @@ swallow() {
 
         xdo move -x "$x" -y "$y" "$cwid"
         xdo resize -w "$w" -h "$h" "$cwid"
-        echo "ConfigureNotify ($x,$y), width $w, height $h" \
+        echo "event ($x,$y), width $w, height $h" \
                 > "/tmp/swallowed-by-$cwid-structure"
         xprop -notype -id "$cwid" _NET_WM_DESKTOP > "/tmp/swallowed-by-$cwid-desk"
         # subscribe to window
         {
-        xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
+        xev -id "$cwid" -event structure -event property | while read -r event ; do
                 [ "${event#*DestroyNotify}" != "$event" ] && pkill -s 0 -f "xev.*$cwid"
-                [ "${event#*ConfigureNotify}" != "$event" ] \
+                [ "${event#* width }" != "$event" ] \
                         && echo "$event" > "/tmp/swallowed-by-$cwid-structure"
                 [ "${event#*_NET_WM_DESKTOP}" != "$event" ] \
                         && xprop -notype -id "$cwid" _NET_WM_DESKTOP  \
