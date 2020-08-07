@@ -91,7 +91,11 @@ Environment variables can be exported to change the behavior of pidswallow.
 
 The following ones accept lists of space separated process names.
 * `PIDSWALLOW_SWALLOWABLE`: can be swallowed by pidswallow (shells). Default: \<your-login-shell>
-* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed. Default: copy from "$PIDSWALLOW_SWALLOW_COMMAND"
+* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed. Default: few terminals. <b>(You must add yor terminal)</b>
+Eg:
+```
+PIDSWALLOW_BLACKLIST=" st urxvt alacritty urxvtd " # process name of your term.
+```
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
 The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
