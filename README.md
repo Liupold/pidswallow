@@ -78,14 +78,15 @@ yay -S pidswallow-dev-git
 ```bash
 pgrep -fl 'pidswallow -gl' || pidswallow -gl
 ```
-2) Restart wm.
 
-3) (For daemon-based terminals) add the following to your `bashrc`, `zshrc` or shell init script.
+2) Add the following to your `bashrc`, `zshrc` or shell init script. This step isn't strictly necessary, but it fixes problems with daemon-based terminals and also improves the performance of pidswallow.
 
 ```
 [ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
 trap "( rm -f /tmp/term-wid-"$$" )" EXIT HUP
 ```
+
+3) Restart wm and terminals.
 
 ## Additional Configuration
 Environment variables can be exported to change the behavior of pidswallow.
