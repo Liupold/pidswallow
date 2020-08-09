@@ -32,7 +32,7 @@ vecho() {
 vomit() {
         unset cwid pwid x y w h # similar to local
         cwid=$(printf '0x%x' "$1") # hexadecimal conversion
-        pwid=$(cat "/tmp/swallowed-by-$cwid" 2>/dev/null)
+        [ -f "/tmp/swallowed-by-$cwid" ] && read -r pwid < "/tmp/swallowed-by-$cwid"
         [ -n "$pwid" ] || return 1
         vecho "vomit - $cwid vomiting $pwid using $vomit_command"
         echo "$vomit_command" | \
@@ -96,7 +96,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # no shell found.
         vecho "swallow - $pname($ppid) detected as shell"
-        pwid="$(cat /tmp/term-wid-"$ppid" 2>/dev/null)"
+        [ -f "/tmp/term-wid-$ppid" ] && read -r pwid < "/tmp/term-wid-$ppid"
         [ -z "$pwid" ] && return 4
         if [ "$glue" -eq 1 ]; then
             vecho "swallow - Running preglue hook: $preglue_hook"
