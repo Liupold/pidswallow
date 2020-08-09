@@ -98,7 +98,7 @@ The following ones accept lists of space separated process names.
 The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
 * `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide {%pwid}`
 * `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show {%pwid}`
-* `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
+* `PIDSWALLOW_PREGLUE_HOOK`: executed before swallowing new child window when using `--glue`. Useful for floating windows in tiled WMs. Default: empty
 
 ## Tested on
 *(If you did please let me know, If it dosent work create a issue).*
