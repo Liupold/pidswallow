@@ -91,8 +91,9 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 Environment variables can be exported to change the behavior of pidswallow.
 
 The following ones accept lists of space separated process names.
-* `PIDSWALLOW_SHELL`: your shell (e.g `bash`). Default: `$SHELL`
-* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed. Default: few terminals. (if you launch one term from another you might add that to blacklist).
+* `PIDSWALLOW_SHELL`: your shell(s) (e.g `bash`). Default: Taken from `$SHELL`
+* `PIDSWALLOW_TERMINAL`: your terminal(s), as fallback if shell is not used (and if terminal supports it). Default: `$TERMINAL`
+* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed, (if you launch one term from another you might want to add it to blacklist). Default: same as `$PIDSWALLOW_TERMINAL`
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
 The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.

@@ -16,7 +16,8 @@ OPTIONS:
 bugs/issues: https://github.com/liupold/pidswallow.
 "
 shell=" ${PIDSWALLOW_SHELL:-" ${SHELL##*/} "} "
-blacklist=" ${PIDSWALLOW_BLACKLIST:-" $TERMINAL "} "
+terminal=" ${PIDSWALLOW_TERMINAL:-" $TERMINAL "} "
+blacklist=" ${PIDSWALLOW_BLACKLIST:-" $terminal "} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
 swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
 vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show {%pwid\}}"
@@ -74,7 +75,6 @@ vomit() {
 swallow() {
         # return values
         # 0 -> Found and swallowed
-        # 1 -> No shell found.
         # 3 -> window lacks a _NET_WM_PID property.
         # 4 -> window already swallowed / not possible
         # 5 -> swallow_command failed
@@ -91,12 +91,17 @@ swallow() {
         vecho "swallow - Scanning process tree of $cname($cpid): $process_tree"
         for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
-                [ "${shell#* $pname }" != "$shell" ] \
-                        && ppid="${parent##*:}" && break
+                ppid="${parent##*:}"
+                if [ "${shell#* $pname }" != "$shell" ] && [ -f "/tmp/term-wid-$ppid" ]; then
+                        vecho "swallow - $pname($ppid) detected as shell"
+                        read -r pwid < "/tmp/term-wid-$ppid"
+                        break
+                elif [ "${terminal#* $pname}" != "$terminal" ]; then
+                        vecho "swallow - $pname($ppid) detected as terminal (fallback)"
+                        pwid="$(xdo id -p "$ppid" | sed 1q)"
+                        break
+                fi
         done
-        [ -z "$ppid" ] && return 1 # no shell found.
-        vecho "swallow - $pname($ppid) detected as shell"
-        [ -f "/tmp/term-wid-$ppid" ] && read -r pwid < "/tmp/term-wid-$ppid"
         [ -z "$pwid" ] && return 4
         if [ "$glue" -eq 1 ]; then
             vecho "swallow - Running preglue hook: $preglue_hook"
@@ -108,7 +113,7 @@ swallow() {
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
                 return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
-        vecho "swallow - $cname ($cwid) swallowed $pname's terminal ($pwid)"
+        vecho "swallow - $cname ($cwid) swallowed $pname (or its terminal) ($pwid)"
 
         [ "$glue" -ne  1 ] ||\
                 [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
@@ -182,6 +187,7 @@ while true; do
                 '-V'|'--verbose')
                         verbose=1
                         vecho "shell: \"$shell\""
+                        vecho "terminal: \"$terminal\""
                         shift; continue;;
                 '-g'|'--glue')
                         glue=1
