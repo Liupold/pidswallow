@@ -116,7 +116,7 @@ swallow() {
 
         pgeo=$(xwininfo -shape -id "$pwid" | tr -d '\n ')
         x="${pgeo##*Absoluteupper-leftX:}"; x="${x%%Absoluteupper-leftY:*}"
-        y="${pgeo##*absoluteupper-lefty:}"; y="${y%%relativeupper-leftx:*}"
+        y="${pgeo##*Absoluteupper-leftY:}"; y="${y%%Relativeupper-leftX:*}"
         w="${pgeo##*Width:}"; w="${w%%Height:*}"
         h="${pgeo##*Height:}"; h="${h%%Depth:*}"
 
