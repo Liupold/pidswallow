@@ -96,7 +96,7 @@ swallow() {
         done
         [ -z "$ppid" ] && return 1 # nothing swallowable.
         vecho "swallow - $pname($ppid) detected as swallowable"
-        [ -f "/tmp/term-wid-$ppid" ] && pwid="$(cat /tmp/term-wid-"$ppid")"
+        pwid="$(cat /tmp/term-wid-"$ppid" 2>/dev/null)"
         [ -z "$pwid" ] && return 4
         [ "$glue" -eq 1 ] && echo "$preglue_hook" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
