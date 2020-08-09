@@ -116,11 +116,11 @@ swallow() {
         echo "$preglue_hook" | \
                 sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
 
-        pgeo=$(xwininfo -shape -id "$pwid")
-        x=$(echo "$pgeo" | grep -m1 "X" ); x="${x##* }"
-        y=$(echo "$pgeo" | grep -m1 "Y" ); y="${y##* }"
-        w=$(echo "$pgeo" | grep -m1 "Width" ); w="${w##* }"
-        h=$(echo "$pgeo" | grep -m1 "Height" ); h="${h##* }"
+        pgeo=$(xwininfo -shape -id "$pwid" | tr -d '\n ')
+        x="${pgeo##*Absoluteupper-leftX:}"; x="${x%%Absoluteupper-leftY:*}"
+        y="${pgeo##*absoluteupper-lefty:}"; y="${y%%relativeupper-leftx:*}"
+        w="${pgeo##*Width:}"; w="${w%%Height:*}"
+        h="${pgeo##*Height:}"; h="${h%%Depth:*}"
 
         xdo move -x "$x" -y "$y" "$cwid"
         xdo resize -w "$w" -h "$h" "$cwid"
