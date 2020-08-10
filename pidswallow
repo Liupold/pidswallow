@@ -56,8 +56,8 @@ vomit() {
                         structure="${structure#*,}"; y="${structure%%)*}"
                         structure="${structure#*width }"; w="${structure%%,*}"
                         h="${structure#*height }"
-                        xdo move -x "$x" -y "$y" "$pwid"
                         xdo resize -w "$w" -h "$h" "$pwid"
+                        xdo move -x "$x" -y "$y" "$pwid"
                 }
 
                 [ -f "/tmp/swallowed-by-$cwid-desk" ] && {
@@ -122,8 +122,8 @@ swallow() {
         w="${pgeo##*Width:}"; w="${w%%Height:*}"
         h="${pgeo##*Height:}"; h="${h%%Depth:*}"
 
-        xdo move -x "$x" -y "$y" "$cwid"
         xdo resize -w "$w" -h "$h" "$cwid"
+        xdo move -x "$x" -y "$y" "$cwid"
         echo "event ($x,$y), width $w, height $h" \
                 > "/tmp/swallowed-by-$cwid-structure"
         xprop -notype -id "$cwid" _NET_WM_DESKTOP > "/tmp/swallowed-by-$cwid-desk"

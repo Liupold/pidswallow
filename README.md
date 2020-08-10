@@ -116,6 +116,8 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 ## Knows Issues
 * <b>sxiv</b> doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
+* mpv (window incorrect size)
+    - Solution: use `--no-keepaspect-window` flag when launching.
 
 ## Tricks
 ### Manual swallow (toggle)
