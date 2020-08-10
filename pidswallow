@@ -67,7 +67,7 @@ vomit() {
                         xdotool set_desktop_for_window "$pwid" "$desk"
                 }
         fi
-        # rm -f "/tmp/swallowed-by-$cwid-structure" "/tmp/swallowed-by-$cwid-desk"
+        rm -f "/tmp/swallowed-by-$cwid-structure" "/tmp/swallowed-by-$cwid-desk"
 
 }
 
