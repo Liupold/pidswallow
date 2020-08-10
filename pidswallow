@@ -51,24 +51,23 @@ vomit() {
 
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ];
         then
-                [ -f "/tmp/swallowed-by-$cwid-structure" ] && \
-                sed -unEe 's/.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
-                -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
-                "/tmp/swallowed-by-$cwid-structure" |
-                {
-                        read -r x y w h
+                [ -f "/tmp/swallowed-by-$cwid-structure" ] && {
+                        read -r structure < "/tmp/swallowed-by-$cwid-structure"
+                        structure="${structure#*\(}"; x="${structure%%,*}"
+                        structure="${structure#*,}"; y="${structure%%)*}"
+                        structure="${structure#*width }"; w="${structure%%,*}"
+                        h="${structure#*height }"
                         xdo move -x "$x" -y "$y" "$pwid"
                         xdo resize -w "$w" -h "$h" "$pwid"
                 }
 
-                [ -f "/tmp/swallowed-by-$cwid-desk" ] && \
-                grep -o '[0-9]\+' "/tmp/swallowed-by-$cwid-desk" |
-                {
-                        read -r desk
+                [ -f "/tmp/swallowed-by-$cwid-desk" ] && {
+                        read -r desk < "/tmp/swallowed-by-$cwid-desk"
+                        desk="${desk##* }"
                         xdotool set_desktop_for_window "$pwid" "$desk"
                 }
         fi
-        rm -f "/tmp/swallowed-by-$cwid-structure" "/tmp/swallowed-by-$cwid-desk"
+        # rm -f "/tmp/swallowed-by-$cwid-structure" "/tmp/swallowed-by-$cwid-desk"
 
 }
 
