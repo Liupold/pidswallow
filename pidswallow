@@ -98,7 +98,9 @@ swallow() {
                         break
                 elif [ "${terminal#* $pname}" != "$terminal" ]; then
                         vecho "swallow - $pname($ppid) detected as terminal (fallback)"
-                        pwid="$(xdo id -p "$ppid" | sed 1q)"
+                        pwid=$(xdo id -p "$ppid" | {
+                                read -r temp; echo "$temp"
+                        } )
                         break
                 fi
         done
