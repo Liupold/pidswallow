@@ -166,7 +166,9 @@ loop() {
                 done
                 prev_event="$event"
                 [ -n "$node_added" ] && swallow "$node_added"
-                [ -n "$node_removed" ] && vomit "$node_removed"
+                [ -n "$node_removed" ] &&  {
+                        xprop -id "$node_removed" >/dev/null 2>&1 || vomit "$node_removed"
+                }
         done
         return 1
 }
