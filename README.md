@@ -97,9 +97,9 @@ The following ones accept lists of space separated process names.
 * `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed, (if you launch one term from another you might want to add it to blacklist). Default: same as `$PIDSWALLOW_TERMINAL`
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
-The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
-* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide {%pwid}`
-* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show {%pwid}`
+The ones following are executed in a subshell (`/bin/sh`) and support the special strings `$pwid` and `$cwid`, holding the parent and child window IDs, respectively.
+* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide $pwid`
+* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show $pwid`
 * `PIDSWALLOW_PREGLUE_HOOK`: executed before swallowing new child window when using `--glue`. Useful for floating windows in tiled WMs. Default: empty
 
 ## Tested on
@@ -143,15 +143,15 @@ Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
 
 ```bash
-export PIDSWALLOW_SWALLOW_COMMAND='bspc node {%pwid} --flag hidden=on'
-export PIDSWALLOW_VOMIT_COMMAND='bspc node {%pwid} --flag hidden=off'
+export PIDSWALLOW_SWALLOW_COMMAND='bspc node $pwid --flag hidden=on'
+export PIDSWALLOW_VOMIT_COMMAND='bspc node $pwid --flag hidden=off'
 ```
 This way bspwm will remember window positions and won't lose track of swallowed windows.
 
 * Follow `floating` state of parent (when using `--glue`).
 
 ```bash
-export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n {%pwid}.floating >/dev/null && bspc node {%cwid} --state floating'
+export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n $pwid.floating >/dev/null && bspc node $cwid --state floating'
 ```
 Check if parent window state is `floating` and apply the same to the child if that's the case.
 This example should work in most cases, but feel free to add more complex hooks to your setup. (e.g. to mimic more properties of the parent).

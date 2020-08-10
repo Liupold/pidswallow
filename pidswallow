@@ -19,8 +19,8 @@ shell=" ${PIDSWALLOW_SHELL:-" ${SHELL##*/} "} "
 terminal=" ${PIDSWALLOW_TERMINAL:-" $TERMINAL "} "
 blacklist=" ${PIDSWALLOW_BLACKLIST:-" $terminal "} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
-swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
-vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show {%pwid\}}"
+swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide \$pwid}"
+vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show \$pwid}"
 preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
 verbose=0
@@ -36,8 +36,7 @@ vomit() {
         [ -f "/tmp/swallowed-by-$cwid" ] && read -r pwid < "/tmp/swallowed-by-$cwid"
         [ -n "$pwid" ] || return 1
         vecho "vomit - $cwid vomiting $pwid using $vomit_command"
-        echo "$vomit_command" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
+        echo "pwid=$pwid;cwid=$cwid;" "$vomit_command" | /bin/sh
 
 
         vecho "vomit - $cwid vomited $pwid"
@@ -106,13 +105,10 @@ swallow() {
         [ -z "$pwid" ] && return 4
         if [ "$glue" -eq 1 ]; then
             vecho "swallow - Running preglue hook: $preglue_hook"
-            echo "$preglue_hook" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
+            echo "pwid=$pwid;cwid=$cwid;" "$preglue_hook" | /bin/sh
         fi
         vecho "swallow - $cwid swallowing $pwid using $swallow_command"
-        echo "$swallow_command" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
-                return 5
+        echo "pwid=$pwid;cwid=$cwid;" "$swallow_command" | /bin/sh || return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
         vecho "swallow - $cname ($cwid) swallowed $pname (or its terminal) ($pwid)"
 
