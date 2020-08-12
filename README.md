@@ -28,16 +28,15 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 ```
+* POSIX compliant shell script.
 * Just pass in the window id of the swallower.
 * Work on a toggle mode. (swallow if not swallowed else vomit).
-* Super fast. (Really!) (0.04s) (worst case).
+* Super fast. (Really!) (28.0ms). (using `dash`).
 
-```
-$ time pidswallow -t 0x3400003
-pidswallow -t 0x3400003  0.04s user 0.04s system 125% cpu 0.065 total (swallow)
-
-$ time pidswallow -t 0x3400003
-pidswallow -t 0x3400003  0.02s user 0.01s system 107% cpu 0.030 total (vomit)
+```sh
+Benchmark #1: pidswallow -s 0x02A00003
+  Time (mean ± σ):      28.0 ms ±   4.3 ms    [User: 13.8 ms, System: 18.0 ms]
+  Range (min … max):    24.1 ms …  48.0 ms    74 runs
 ```
 
 ## Demo
