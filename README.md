@@ -28,16 +28,15 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 ```
+* POSIX compliant shell script.
 * Just pass in the window id of the swallower.
 * Work on a toggle mode. (swallow if not swallowed else vomit).
-* Super fast. (Really!) (0.04s) (worst case).
+* Super fast. (Really!) (28.0ms). (using `dash`).
 
-```
-$ time pidswallow -t 29360131
-pidswallow -t 0x3400003  0.04s user 0.04s system 125% cpu 0.065 total (swallow)
-
-$ time pidswallow -t 29360131
-pidswallow -t 0x3400003  0.02s user 0.01s system 107% cpu 0.030 total (vomit)
+```sh
+Benchmark #1: pidswallow -s 0x02A00003
+  Time (mean ± σ):      28.0 ms ±   4.3 ms    [User: 13.8 ms, System: 18.0 ms]
+  Range (min … max):    24.1 ms …  48.0 ms    74 runs
 ```
 
 ## Demo
@@ -73,26 +72,34 @@ yay -S pidswallow-dev-git
  Add `pidswallow` to your path.
 
 ### Autostart
-
-2) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
+1) Launch when WM/DE starts (Example: .xinitrc, i3-config, bspwrc)
 
 ```bash
 pgrep -fl 'pidswallow -gl' || pidswallow -gl
 ```
-3) Restart wm.
+
+2) Add the following to your `bashrc`, `zshrc` or shell init script. This step isn't strictly necessary, but it fixes problems with daemon-based terminals and also improves the performance of pidswallow.
+
+```
+[ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
+trap "( rm -f /tmp/term-wid-"$$" )" EXIT HUP
+```
+
+3) Restart wm and terminals.
 
 ## Additional Configuration
 Environment variables can be exported to change the behavior of pidswallow.
 
 The following ones accept lists of space separated process names.
-* `PIDSWALLOW_SWALLOWABLE`: can be swallowed by pidswallow (e.g. your terminal). Default: "alacritty urxvt konsole xfce4-terminal"
-* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed. Default: copy from `$PIDSWALLOW_SWALLOWABLE`
+* `PIDSWALLOW_SHELL`: your shell(s) (e.g `bash`). Default: Taken from `$SHELL`
+* `PIDSWALLOW_TERMINAL`: your terminal(s), as fallback if shell is not used (and if terminal supports it). Default: `$TERMINAL`
+* `PIDSWALLOW_BLACKLIST`: parent cannot be swallowed, (if you launch one term from another you might want to add it to blacklist). Default: same as `$PIDSWALLOW_TERMINAL`
 * `PIDSWALLOW_GLUE_BLACKLIST`: not touched by `--glue`. Default: empty
 
-The ones following are executed in a subshell (`/bin/sh`) and support the special strings `{%pwid}` and `{%cwid}`, holding the parent and child window IDs, respectively.
-* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide {%pwid}`
-* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show {%pwid}`
-* `PIDSWALLOW_PREGLUE_HOOK`: executed before gluing (resizing) new child window. Only applies when `--glue` is used. Default: empty
+The ones following are executed in a subshell (`/bin/sh`) and support the special strings `$pwid` and `$cwid`, holding the parent and child window IDs, respectively.
+* `PIDSWALLOW_SWALLOW_COMMAND`: used to swallow (hide) windows. Default: `xdo hide $pwid`
+* `PIDSWALLOW_VOMIT_COMMAND`: used to vomit (unhide) windows. Default: `xdo show $pwid`
+* `PIDSWALLOW_PREGLUE_HOOK`: executed before swallowing new child window when using `--glue`. Useful for floating windows in tiled WMs. Default: empty
 
 ## Tested on
 *(If you did please let me know, If it dosent work create a issue).*
@@ -108,14 +115,8 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 ## Knows Issues
 * <b>sxiv</b> doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
-* By default, every <b>Xfce Terminal</b> is connected to the same D-Bus daemon. This makes it hard for pidswallow to see which terminal should be swallowed, since they all share the same PID.
-
-   -> As a workaround, you can edit the Xfce Terminal launcher to use the `--disable-server` flag:
-    - Open Application Finder
-    - Search for "Xfce Terminal"
-    - Right click the result that has "Terminal Emulator" as its description and click Edit
-    - Change the "Command" field to `xfce4-terminal --disable-server`
-    - Save
+* mpv (window incorrect size)
+    - Solution: use `--no-keepaspect-window` flag when launching.
 
 ## Tricks
 ### Manual swallow (toggle)
@@ -143,15 +144,15 @@ Add each set of lines to your `bspwmrc`, right before running pidswallow.
 * Let bspwm handle window hiding.
 
 ```bash
-export PIDSWALLOW_SWALLOW_COMMAND='bspc node {%pwid} --flag hidden=on'
-export PIDSWALLOW_VOMIT_COMMAND='bspc node {%pwid} --flag hidden=off'
+export PIDSWALLOW_SWALLOW_COMMAND='bspc node $pwid --flag hidden=on'
+export PIDSWALLOW_VOMIT_COMMAND='bspc node $pwid --flag hidden=off'
 ```
 This way bspwm will remember window positions and won't lose track of swallowed windows.
 
 * Follow `floating` state of parent (when using `--glue`).
 
 ```bash
-export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n {%pwid}.floating >/dev/null && bspc node {%cwid} --state floating'
+export PIDSWALLOW_PREGLUE_HOOK='bspc query -N -n $pwid.floating >/dev/null && bspc node $cwid --state floating'
 ```
 Check if parent window state is `floating` and apply the same to the child if that's the case.
 This example should work in most cases, but feel free to add more complex hooks to your setup. (e.g. to mimic more properties of the parent).

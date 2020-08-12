@@ -15,11 +15,12 @@ OPTIONS:
 
 bugs/issues: https://github.com/liupold/pidswallow.
 "
-swallowable=" ${PIDSWALLOW_SWALLOWABLE:-"$TERMINAL xterm konsole xfce4-terminal"} "
-blacklist=" ${PIDSWALLOW_BLACKLIST:-"$swallowable"} "
+shell=" ${PIDSWALLOW_SHELL:-" ${SHELL##*/} "} "
+terminal=" ${PIDSWALLOW_TERMINAL:-" $TERMINAL "} "
+blacklist=" ${PIDSWALLOW_BLACKLIST:-" $terminal "} "
 glue_blacklist=" $PIDSWALLOW_GLUE_BLACKLIST "
-swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide {%pwid\}}"
-vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show {%pwid\}}"
+swallow_command="${PIDSWALLOW_SWALLOW_COMMAND:-xdo hide \$pwid}"
+vomit_command="${PIDSWALLOW_VOMIT_COMMAND:-xdo show \$pwid}"
 preglue_hook="$PIDSWALLOW_PREGLUE_HOOK"
 
 verbose=0
@@ -31,12 +32,11 @@ vecho() {
 
 vomit() {
         unset cwid pwid x y w h # similar to local
-        cwid=$(printf "%d\n" "$1") # decimal conversion
-        pwid=$(cat "/tmp/swallowed-by-$cwid" 2>/dev/null)
+        cwid=$(printf '0x%x' "$1") # hexadecimal conversion
+        [ -f "/tmp/swallowed-by-$cwid" ] && read -r pwid < "/tmp/swallowed-by-$cwid"
         [ -n "$pwid" ] || return 1
         vecho "vomit - $cwid vomiting $pwid using $vomit_command"
-        echo "$vomit_command" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
+        echo "pwid=$pwid;cwid=$cwid;" "$vomit_command" | /bin/sh
 
 
         vecho "vomit - $cwid vomited $pwid"
@@ -50,20 +50,19 @@ vomit() {
 
         if [ "$glue" -eq  1 ] && [ "${glue_blacklist#* $cname}" = "$glue_blacklist" ];
         then
-                [ -f "/tmp/swallowed-by-$cwid-structure" ] && \
-                sed -unEe 's/ConfigureNotify.*\((-?[0-9]+),(-?[0-9]+)\),/\1 \2/'\
-                -e 's/width ([0-9]+), height ([0-9]+).*/\1 \2/p' \
-                "/tmp/swallowed-by-$cwid-structure" |
-                {
-                        read -r x y w h
-                        xdo move -x "$x" -y "$y" "$pwid"
+                [ -f "/tmp/swallowed-by-$cwid-structure" ] && {
+                        read -r structure < "/tmp/swallowed-by-$cwid-structure"
+                        structure="${structure#*\(}"; x="${structure%%,*}"
+                        structure="${structure#*,}"; y="${structure%%)*}"
+                        structure="${structure#*width }"; w="${structure%%,*}"
+                        h="${structure#*height }"
                         xdo resize -w "$w" -h "$h" "$pwid"
+                        xdo move -x "$x" -y "$y" "$pwid"
                 }
 
-                [ -f "/tmp/swallowed-by-$cwid-desk" ] && \
-                grep -o '[0-9]\+' "/tmp/swallowed-by-$cwid-desk" |
-                {
-                        read -r desk
+                [ -f "/tmp/swallowed-by-$cwid-desk" ] && {
+                        read -r desk < "/tmp/swallowed-by-$cwid-desk"
+                        desk="${desk##* }"
                         xdotool set_desktop_for_window "$pwid" "$desk"
                 }
         fi
@@ -74,12 +73,11 @@ vomit() {
 swallow() {
         # return values
         # 0 -> Found and swallowed
-        # 1 -> No swallowable window found.
         # 3 -> window lacks a _NET_WM_PID property.
-        # 4 -> window already swallowed
+        # 4 -> window already swallowed / not possible
         # 5 -> swallow_command failed
         unset cwid pwid cname pname ppid cpid x y w h # similar to local.
-        cwid=$(printf "%d\n" "$1") # decimal conversion
+        cwid=$(printf '0x%x' "$1") # hexadecimal conversion
         [ -f "/tmp/swallowed-by-$cwid" ] && return 4
         cpid="$(xdo pid "$cwid")" || return 3
         cname="$(ps -p "$cpid" -o comm=)"
@@ -91,44 +89,49 @@ swallow() {
         vecho "swallow - Scanning process tree of $cname($cpid): $process_tree"
         for parent in $process_tree; do
                 pname="${parent%%:*}" # ancestor name
-                [ "${swallowable#* $pname }" != "$swallowable" ] \
-                        && ppid="${parent##*:}" && break
+                ppid="${parent##*:}"
+                if [ "${shell#* $pname }" != "$shell" ] && [ -f "/tmp/term-wid-$ppid" ]; then
+                        vecho "swallow - $pname($ppid) detected as shell"
+                        read -r pwid < "/tmp/term-wid-$ppid"
+                        break
+                elif [ "${terminal#* $pname}" != "$terminal" ]; then
+                        vecho "swallow - $pname($ppid) detected as terminal (fallback)"
+                        pwid=$(xdo id -p "$ppid" | {
+                                read -r temp; echo "$temp"
+                        } )
+                        break
+                fi
         done
-        [ -z "$ppid" ] && return 1 # nothing swallowable.
-        vecho "swallow - $pname($ppid) detected as swallowable"
-        pwid="$(xdo id -p "$ppid" | sed 1q)"
         [ -z "$pwid" ] && return 4
-        [ "$glue" -eq 1 ] && echo "$preglue_hook" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
+        if [ "$glue" -eq 1 ]; then
+            vecho "swallow - Running preglue hook: $preglue_hook"
+            echo "pwid=$pwid;cwid=$cwid;" "$preglue_hook" | /bin/sh
+        fi
         vecho "swallow - $cwid swallowing $pwid using $swallow_command"
-        echo "$swallow_command" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh || \
-                return 5
+        echo "pwid=$pwid;cwid=$cwid;" "$swallow_command" | /bin/sh || return 5
         echo "$pwid" > "/tmp/swallowed-by-$cwid"
-        vecho "swallow - $cname($cwid) swallowed $pname($pwid)"
+        vecho "swallow - $cname ($cwid) swallowed $pname (or its terminal) ($pwid)"
 
         [ "$glue" -ne  1 ] ||\
                 [ "${glue_blacklist#* $cname}" != "$glue_blacklist" ] && return 0
 
-        echo "$preglue_hook" | \
-                sed -e "s|{%pwid}|$pwid|g" -e "s|{%cwid}|$cwid|g" | /bin/sh
 
-        pgeo=$(xwininfo -shape -id "$pwid")
-        x=$(echo "$pgeo" | grep -m1 "X" ); x="${x##* }"
-        y=$(echo "$pgeo" | grep -m1 "Y" ); y="${y##* }"
-        w=$(echo "$pgeo" | grep -m1 "Width" ); w="${w##* }"
-        h=$(echo "$pgeo" | grep -m1 "Height" ); h="${h##* }"
+        pgeo=$(xwininfo -shape -id "$pwid" | tr -d '\n ')
+        x="${pgeo##*Absoluteupper-leftX:}"; x="${x%%Absoluteupper-leftY:*}"
+        y="${pgeo##*Absoluteupper-leftY:}"; y="${y%%Relativeupper-leftX:*}"
+        w="${pgeo##*Width:}"; w="${w%%Height:*}"
+        h="${pgeo##*Height:}"; h="${h%%Depth:*}"
 
-        xdo move -x "$x" -y "$y" "$cwid"
         xdo resize -w "$w" -h "$h" "$cwid"
-        echo "ConfigureNotify ($x,$y), width $w, height $h" \
+        xdo move -x "$x" -y "$y" "$cwid"
+        echo "event ($x,$y), width $w, height $h" \
                 > "/tmp/swallowed-by-$cwid-structure"
         xprop -notype -id "$cwid" _NET_WM_DESKTOP > "/tmp/swallowed-by-$cwid-desk"
         # subscribe to window
         {
-        xev -id "$cwid" -1 -event structure -event property | while read -r event ; do
+        xev -id "$cwid" -event structure -event property | while read -r event ; do
                 [ "${event#*DestroyNotify}" != "$event" ] && pkill -s 0 -f "xev.*$cwid"
-                [ "${event#*ConfigureNotify}" != "$event" ] \
+                [ "${event#* width }" != "$event" ] \
                         && echo "$event" > "/tmp/swallowed-by-$cwid-structure"
                 [ "${event#*_NET_WM_DESKTOP}" != "$event" ] \
                         && xprop -notype -id "$cwid" _NET_WM_DESKTOP  \
@@ -138,7 +141,7 @@ swallow() {
 }
 
 toggle() {
-        cwid=$(printf "%d\n" "$1") # decimal conversion
+        cwid=$(printf '0x%x' "$1") # hexadecimal conversion
         if [ -f "/tmp/swallowed-by-$cwid" ]; then
                 vomit "$cwid"
                 return "$?"
@@ -163,7 +166,9 @@ loop() {
                 done
                 prev_event="$event"
                 [ -n "$node_added" ] && swallow "$node_added"
-                [ -n "$node_removed" ] && vomit "$node_removed"
+                [ -n "$node_removed" ] &&  {
+                        xprop -id "$node_removed" >/dev/null 2>&1 || vomit "$node_removed"
+                }
         done
         return 1
 }
@@ -180,7 +185,8 @@ while true; do
         case "$1" in
                 '-V'|'--verbose')
                         verbose=1
-                        vecho "SWALLOWABLE: \"$swallowable\""
+                        vecho "shell: \"$shell\""
+                        vecho "terminal: \"$terminal\""
                         shift; continue;;
                 '-g'|'--glue')
                         glue=1
