@@ -79,6 +79,7 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 ```
 
 2) Add the following to your `bashrc`, `zshrc` or shell init script. This step isn't strictly necessary, but it fixes problems with daemon-based terminals and also improves the performance of pidswallow.
+**Note:** Your window manager has to focus new terminals as soon as they are spawned for this to work correctly.
 
 ```
 [ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
