@@ -82,8 +82,9 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 **Note:** Your window manager has to focus new terminals as soon as they are spawned for this to work correctly.
 
 ```
-[ -n "$DISPLAY" ]  && command -v xdo >/dev/null 2>&1 && xdo id > /tmp/term-wid-"$$"
-trap "( rm -f /tmp/term-wid-"$$" )" EXIT HUP
+# pidswallow
+pidswallow_tmp_term_wid="$(pidswallow_save_terminal_wid "$$" "Alacritty")" && trap "( rm -f /tmp/term-wid-"$$" /tmp/term-pid-"$pidswallow_tmp_term_wid" )" EXIT HUP
+unset pidswallow_tmp_term_wid
 ```
 
 3) Restart wm and terminals.
