@@ -7,7 +7,7 @@ if [ -n "$DISPLAY" ] && which xdo >/dev/null 2>&1; then
         attempt=0
         while [ "$attempt" -lt 5 ]; do
                 terminal_wid="$(xdo id -m)"
-                if [ ! -f "/tmp/term-pid-$terminal_wid" ] && [ "$(xdo id -N $terminal_class $terminal_wid)" ]; then
+                if [ ! -f "/tmp/term-pid-$terminal_wid" ] && [ "$(xdo id -N "$terminal_class" "$terminal_wid")" ]; then
                         echo "$terminal_pid" > /tmp/term-pid-"$terminal_wid"
                         echo "$terminal_wid" > /tmp/term-wid-"$terminal_pid"
                         echo "$terminal_wid" # output for trap
