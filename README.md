@@ -79,6 +79,7 @@ pgrep -fl 'pidswallow -gl' || pidswallow -gl
 ```
 
 2) Add the following to your `bashrc`, `zshrc` or shell init script. This step isn't strictly necessary, but it fixes problems with daemon-based terminals and also improves the performance of pidswallow.
+**Note:** You might want to skip this step if you use Alacritty (see [Known Issues](#known-issues)).
 **Note:** Your window manager has to focus new terminals as soon as they are spawned for this to work correctly.
 
 ```
@@ -113,11 +114,13 @@ The ones following are executed in a subshell (`/bin/sh`) and support the specia
 * [Xfce](https://www.xfce.org/)
 * [herbstluftwm](https://herbstluftwm.org/) (by [cbf305](https://github.com/cbf305))
 
-## Knows Issues
+## Known Issues
 * <b>sxiv</b> doesn't support this (as of now). https://github.com/muennich/sxiv/issues/398
     - Solution: https://github.com/elkowar/sxiv/tree/set_net_wm_pid (use this).
 * mpv (window incorrect size)
     - Solution: use `--no-keepaspect-window` flag when launching.
+* Alacritty won't work with the shell based approach if your shell init script is sourced too quickly. See [this](https://github.com/alacritty/alacritty/issues/2817) issue.
+    - Solution: fall back to terminal based approach, by skipping [Autostart step 2](#autostart)
 
 ## Tricks
 ### Manual swallow (toggle)
