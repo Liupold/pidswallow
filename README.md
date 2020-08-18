@@ -58,7 +58,7 @@ takes wid as as arg --> gets process tree --> check blacklist --> hide parent.
 ## Installation
 
 ### Using AUR
-* stable release. (Currently on 1.0)
+* stable release. (Currently on 2.0)
 
 ```bash
 yay -S pidswallow
