@@ -1,0 +1,98 @@
+.TH PIDSWALLOW 1 pidswallow\-2.0.d
+.SH NAME
+pidswallow \- swallow using pid(s).
+.SH SYNOPSIS
+.B pidswallow
+.RB [ \-Vg ]
+.RB [ \-s | \-v | \-t
+.IR <WINDOW_ID> ]
+.RB [ \-s | \-v | \-t
+.IR <WINDOW_ID> ] ...
+
+.B pidswallow
+.RB [ \-Vg ]
+.IR WINDOW_ID
+
+.B pidswallow
+.RB [ \-Vg ]
+.RB [ \-l ]
+
+.SH DESCRIPTION
+.B pidswallow
+A super easy to config script written to auto hide the terminal window.
+(so that you don't have to). Window Manager agnostic.
+.SH OPTIONS
+.TP
+.B \-s
+.BI \-\-swallow " <WINDOW_ID>"
+
+Hides parent window of the given child window id.
+.TP
+.B \-v
+.BI \-\-vomit " <WINDOW_ID>"
+
+Unhides parent window of the given child window id.
+.TP
+.B \-t
+.BI \-\-toggle " <WINDOW_ID>"
+
+Toggle between swallow and vomit. (default if no flag is specified)
+.TP
+.B \-g
+.BI \-\-glue
+
+Treat if parent and child window are same. (recommended)
+.TP
+.B \-l
+.BI \-\-loop
+
+Listen and hide / unhide windows on launch / remove. (Blocking)
+.TP
+.B \-V
+.BI \-\-verbose
+
+Shows useful information.
+.SH ENVIRONMENT VARIABLES
+.IP \[bu]
+.I PIDSWALLOW_SHELL
+
+your shell(s) (e.g bash). Default: Taken from $SHELL
+.IP \[bu]
+.I PIDSWALLOW_TERMINAL
+
+your terminal(s), as fallback if shell is not used (and if terminal supports it). Default: $TERMINAL
+.IP \[bu]
+.I PIDSWALLOW_BLACKLIST
+
+parent cannot be swallowed, (if you launch one term from another you might want to add it to blacklist). Default: same as $PIDSWALLOW_TERMINAL
+.IP \[bu]
+.I PIDSWALLOW_GLUE_BLACKLIST
+
+not touched by --glue. Default: empty
+The ones following are executed in a subshell (/bin/sh) and support the special strings $pwid and $cwid, holding the parent and child window IDs, respectively.
+.IP \[bu]
+.I PIDSWALLOW_SWALLOW_COMMAND
+
+used to swallow (hide) windows. Default: xdo hide $pwid
+.IP \[bu]
+.I PIDSWALLOW_VOMIT_COMMAND
+
+used to vomit (unhide) windows. Default: xdo show $pwid
+.IP \[bu]
+.I PIDSWALLOW_PREGLUE_HOOK
+
+executed before swallowing new child window when using --glue. Useful for floating windows in tiled WMs. Default: empty
+.SH EXAMPLES
+.IP "pidswallow -Vs <WINDOW_ID>"
+Swallow the parent window and print details.
+.IP "xdotool getwindowfocus | pidswallow -t"
+Toggle the window (use WINDOW_ID of the focused window).
+.IP "pidswallow -Vgl"
+Listens window events and automatically swallow/vomit windows, print details and treat as if they are glued together.
+.SH BUGS
+Report here: https://github.com/Liupold/pidswallow/issues
+.SH AUTHORS
+.IP \[bu]
+Rohn Chatterjee <rohnch@protonmail.ch>
+.IP \[bu]
+SeerLite <seerlite@tuta.io>
